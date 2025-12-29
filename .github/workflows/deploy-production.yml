@@ -20,6 +20,7 @@ jobs:
           key: ${{ secrets.PRODUCTION_SSH_KEY }}
           port: ${{ secrets.PRODUCTION_PORT }}
           script: |
+            echo "[GITHUB ACTION] Start to execute..."
             cd ${{ secrets.PRODUCTION_PATH }}
             
             echo "--> Git sync..."

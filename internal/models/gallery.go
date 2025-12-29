@@ -10,12 +10,15 @@ import (
 type Gallery struct {
 	ID          uint           `gorm:"primaryKey" json:"id"`
 	UserID      uint           `json:"user_id"`
+	SubjectID   *uint          `json:"subject_id"`
+	SubjectType *string        `json:"subject_type"`
 	FileName    string         `json:"file_name"`
 	FilePath    string         `json:"-"`
 	Url         string         `gorm:"-" json:"url"`
 	FileSize    uint32         `json:"file_size"`
 	IsPrivate   bool           `json:"is_private"`
 	Description string         `json:"description"`
+	HasOptimized bool          `json:"has_optimized"`
 	CreatedAt   time.Time      `json:"created_at"`
 	UpdatedAt   time.Time      `json:"updated_at"`
 	DeletedAt   gorm.DeletedAt `json:"deleted_at" swaggertype:"string"`

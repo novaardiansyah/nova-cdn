@@ -27,21 +27,13 @@ func (r *GalleryRepository) Count() (int64, error) {
 	return count, err
 }
 
-func (r *GalleryRepository) Create(userID uint, fileName, filePath string, fileSize uint32, description string, isPrivate bool) (*models.Gallery, error) {
-	gallery := &models.Gallery{
-		UserID:      userID,
-		FileName:    fileName,
-		FilePath:    filePath,
-		FileSize:    fileSize,
-		Description: description,
-		IsPrivate:   isPrivate,
-	}
+func (r *GalleryRepository) Create(gallery *models.Gallery) error {
 	err := r.db.Create(gallery).Error
 	if err != nil {
-		return nil, err
+		return err
 	}
 	r.db.First(gallery, gallery.ID)
-	return gallery, nil
+	return nil
 }
 
 func (r *GalleryRepository) CreateMany(galleries []*models.Gallery) error {

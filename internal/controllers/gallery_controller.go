@@ -110,35 +110,51 @@ func (ctrl *GalleryController) Upload(c *fiber.Ctx) error {
 	isPrivate := c.FormValue("is_private", "false") == "true"
 	userID := c.Locals("user_id").(uint)
 
-	var galleries []*models.Gallery
-
-	galleries = append(galleries, &models.Gallery{
+	original := &models.Gallery{
 		UserID:      userID,
 		FileName:    newFileName,
 		FilePath:    filePath,
 		FileSize:    uint32(file.Size),
 		Description: description,
 		IsPrivate:   isPrivate,
-	})
+		HasOptimized: true,
+	}
+
+	if err := ctrl.repo.Create(original); err != nil {
+		return utils.ErrorResponse(c, fiber.StatusInternalServerError, "Failed to save original image")
+	}
 
 	processedImages, err := utils.ProcessImage(fullPath, outputDir, newFileName)
 	if err != nil {
 		return utils.ErrorResponse(c, fiber.StatusInternalServerError, "Failed to process image: "+err.Error())
 	}
 
-	for _, img := range processedImages {
-		galleries = append(galleries, &models.Gallery{
-			UserID:      userID,
-			FileName:    img.FileName,
-			FilePath:    img.FilePath,
-			FileSize:    img.FileSize,
-			Description: description,
-			IsPrivate:   isPrivate,
-		})
-	}
+	var galleries []*models.Gallery
+	galleries = append(galleries, original)
 
-	if err := ctrl.repo.CreateMany(galleries); err != nil {
-		return utils.ErrorResponse(c, fiber.StatusInternalServerError, "Failed to save gallery records")
+	if len(processedImages) > 0 {
+		subjectType := "App\\Models\\Gallery"
+		var processedGalleries []*models.Gallery
+
+		for _, img := range processedImages {
+			processedGalleries = append(processedGalleries, &models.Gallery{
+				UserID:      userID,
+				SubjectID:   &original.ID,
+				SubjectType: &subjectType,
+				FileName:    img.FileName,
+				FilePath:    img.FilePath,
+				FileSize:    img.FileSize,
+				Description: description,
+				IsPrivate:   isPrivate,
+				HasOptimized: false,
+			})
+		}
+
+		if err := ctrl.repo.CreateMany(processedGalleries); err != nil {
+			return utils.ErrorResponse(c, fiber.StatusInternalServerError, "Failed to save processed images")
+		}
+
+		galleries = append(galleries, processedGalleries...)
 	}
 
 	return utils.CreatedResponse(c, "Image uploaded successfully", galleries)
