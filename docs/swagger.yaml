@@ -1,0 +1,229 @@
+basePath: /api
+definitions:
+  internal_controllers.GallerySwagger:
+    properties:
+      created_at:
+        type: string
+      deleted_at:
+        type: string
+      description:
+        type: string
+      file_name:
+        type: string
+      file_size:
+        type: integer
+      id:
+        type: integer
+      is_private:
+        type: boolean
+      updated_at:
+        type: string
+      url:
+        type: string
+      user_id:
+        type: integer
+    type: object
+  internal_controllers.LoginRequest:
+    properties:
+      email:
+        type: string
+      password:
+        minLength: 6
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  internal_controllers.LoginResponse:
+    properties:
+      token:
+        type: string
+    type: object
+  nova-cdn_pkg_utils.Meta:
+    properties:
+      current_page:
+        type: integer
+      has_more_pages:
+        type: boolean
+      items_on_page:
+        type: integer
+      per_page:
+        type: integer
+      total_pages:
+        type: integer
+      total_records:
+        type: integer
+    type: object
+  nova-cdn_pkg_utils.PaginatedResponse:
+    properties:
+      data: {}
+      message:
+        type: string
+      meta:
+        $ref: '#/definitions/nova-cdn_pkg_utils.Meta'
+      success:
+        type: boolean
+    type: object
+  nova-cdn_pkg_utils.Response:
+    properties:
+      data: {}
+      message:
+        type: string
+      success:
+        type: boolean
+    type: object
+  nova-cdn_pkg_utils.ValidationErrorResponse:
+    properties:
+      errors:
+        additionalProperties:
+          items:
+            type: string
+          type: array
+        type: object
+      message:
+        type: string
+      success:
+        type: boolean
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: support@novadev.my.id
+    name: API Support
+    url: https://novaardiansyah.my.id
+  description: This is an official Nova CDN API documentation.
+  license:
+    name: MIT License
+    url: https://github.com/novaardiansyah/nova-cdn/blob/main/LICENSE
+  termsOfService: https://novaardiansyah.my.id/live/nova-app/terms-of-service
+  title: Nova CDN API
+  version: "1.0"
+paths:
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Login with email and password to receive a personal access token
+      parameters:
+      - description: Login credentials
+        in: body
+        name: login
+        required: true
+        schema:
+          $ref: '#/definitions/internal_controllers.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/nova-cdn_pkg_utils.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/internal_controllers.LoginResponse'
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/nova-cdn_pkg_utils.Response'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/nova-cdn_pkg_utils.ValidationErrorResponse'
+      summary: Authenticate a user
+      tags:
+      - auth
+  /galleries:
+    get:
+      consumes:
+      - application/json
+      description: Get a paginated list of galleries
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Items per page
+        in: query
+        name: per_page
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/nova-cdn_pkg_utils.PaginatedResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/internal_controllers.GallerySwagger'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/nova-cdn_pkg_utils.Response'
+      security:
+      - BearerAuth: []
+      summary: List galleries
+      tags:
+      - galleries
+  /galleries/upload:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Upload a new image to the gallery with optimized versions
+      parameters:
+      - description: Image file to upload
+        in: formData
+        name: file
+        required: true
+        type: file
+      - description: Image description
+        in: formData
+        name: description
+        type: string
+      - default: false
+        description: Set image as private
+        in: formData
+        name: is_private
+        type: boolean
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            allOf:
+            - $ref: '#/definitions/nova-cdn_pkg_utils.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/internal_controllers.GallerySwagger'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/nova-cdn_pkg_utils.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/nova-cdn_pkg_utils.Response'
+      security:
+      - BearerAuth: []
+      summary: Upload image to gallery
+      tags:
+      - galleries
+securityDefinitions:
+  BearerAuth:
+    description: Enter the token with the `Bearer ` prefix, e.g. "Bearer abcde12345"
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
