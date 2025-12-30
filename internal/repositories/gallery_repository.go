@@ -49,3 +49,23 @@ func (r *GalleryRepository) CreateMany(galleries []*models.Gallery) error {
 		return nil
 	})
 }
+
+func (r *GalleryRepository) FindByID(id uint64, withDeleted bool) (*models.Gallery, error) {
+	var gallery models.Gallery
+	if withDeleted {
+		err := r.db.Unscoped().First(&gallery, id).Error
+		return &gallery, err
+	}
+	err := r.db.First(&gallery, id).Error
+	return &gallery, err
+}
+
+func (r *GalleryRepository) Delete(gallery *models.Gallery) error {
+	err := r.db.Delete(gallery).Error
+	return err
+}
+
+func (r *GalleryRepository) ForceDelete(gallery *models.Gallery) error {
+	err := r.db.Unscoped().Delete(gallery).Error
+	return err
+}

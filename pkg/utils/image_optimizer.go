@@ -77,3 +77,8 @@ func ProcessImage(inputPath, outputDir, baseName string) ([]ProcessedImage, erro
 
 	return results, nil
 }
+
+func RemoveImageFiles(filePath string) error {
+	filePath = "public/" + filePath
+	return os.Remove(filePath)
+}

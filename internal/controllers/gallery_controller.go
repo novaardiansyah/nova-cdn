@@ -111,12 +111,12 @@ func (ctrl *GalleryController) Upload(c *fiber.Ctx) error {
 	userID := c.Locals("user_id").(uint)
 
 	original := &models.Gallery{
-		UserID:      userID,
-		FileName:    newFileName,
-		FilePath:    filePath,
-		FileSize:    uint32(file.Size),
-		Description: description,
-		IsPrivate:   isPrivate,
+		UserID:       userID,
+		FileName:     newFileName,
+		FilePath:     filePath,
+		FileSize:     uint32(file.Size),
+		Description:  description,
+		IsPrivate:    isPrivate,
 		HasOptimized: true,
 	}
 
@@ -138,14 +138,14 @@ func (ctrl *GalleryController) Upload(c *fiber.Ctx) error {
 
 		for _, img := range processedImages {
 			processedGalleries = append(processedGalleries, &models.Gallery{
-				UserID:      userID,
-				SubjectID:   &original.ID,
-				SubjectType: &subjectType,
-				FileName:    img.FileName,
-				FilePath:    img.FilePath,
-				FileSize:    img.FileSize,
-				Description: description,
-				IsPrivate:   isPrivate,
+				UserID:       userID,
+				SubjectID:    &original.ID,
+				SubjectType:  &subjectType,
+				FileName:     img.FileName,
+				FilePath:     img.FilePath,
+				FileSize:     img.FileSize,
+				Description:  description,
+				IsPrivate:    isPrivate,
 				HasOptimized: false,
 			})
 		}
@@ -158,4 +158,68 @@ func (ctrl *GalleryController) Upload(c *fiber.Ctx) error {
 	}
 
 	return utils.CreatedResponse(c, "Image uploaded successfully", galleries)
+}
+
+// Destroy godoc
+// @Summary Delete a gallery item (Soft Delete)
+// @Description Move a gallery item to trash
+// @Tags galleries
+// @Accept json
+// @Produce json
+// @Param id path int true "Gallery ID"
+// @Success 200 {object} utils.Response{data=GallerySwagger}
+// @Failure 400 {object} utils.Response
+// @Failure 500 {object} utils.Response
+// @Router /galleries/{id} [delete]
+// @Security BearerAuth
+func (ctrl *GalleryController) Destroy(c *fiber.Ctx) error {
+	id, err := strconv.Atoi(c.Params("id"))
+	if err != nil {
+		return utils.ErrorResponse(c, fiber.StatusBadRequest, "Invalid gallery ID")
+	}
+
+	gallery, err := ctrl.repo.FindByID(uint64(id), false)
+
+	if err != nil {
+		return utils.ErrorResponse(c, fiber.StatusBadRequest, "Gallery not found")
+	}
+
+	if err := ctrl.repo.Delete(gallery); err != nil {
+		return utils.ErrorResponse(c, fiber.StatusInternalServerError, "Failed to delete gallery")
+	}
+
+	return utils.SuccessResponse(c, "Gallery deleted successfully", gallery)
+}
+
+// ForceDelete godoc
+// @Summary Permanently delete a gallery item
+// @Description Permanently delete a gallery item and its physical files
+// @Tags galleries
+// @Accept json
+// @Produce json
+// @Param id path int true "Gallery ID"
+// @Success 200 {object} utils.Response{data=GallerySwagger}
+// @Failure 400 {object} utils.Response
+// @Failure 500 {object} utils.Response
+// @Router /galleries/{id}/force [delete]
+// @Security BearerAuth
+func (ctrl *GalleryController) ForceDelete(c *fiber.Ctx) error {
+	id, err := strconv.Atoi(c.Params("id"))
+	if err != nil {
+		return utils.ErrorResponse(c, fiber.StatusBadRequest, "Invalid gallery ID")
+	}
+
+	gallery, err := ctrl.repo.FindByID(uint64(id), true)
+
+	if err != nil {
+		return utils.ErrorResponse(c, fiber.StatusBadRequest, "Gallery not found")
+	}
+
+	if err := ctrl.repo.ForceDelete(gallery); err != nil {
+		return utils.ErrorResponse(c, fiber.StatusInternalServerError, "Failed to delete gallery")
+	}
+
+	utils.RemoveImageFiles(gallery.FilePath)
+
+	return utils.SuccessResponse(c, "Gallery deleted successfully", gallery)
 }
