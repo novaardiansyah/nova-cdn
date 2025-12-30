@@ -245,6 +245,42 @@ paths:
       summary: Permanently delete a gallery item
       tags:
       - galleries
+  /galleries/{id}/restore:
+    post:
+      consumes:
+      - application/json
+      description: Restore a gallery item from the trash
+      parameters:
+      - description: Gallery ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/nova-cdn_pkg_utils.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/internal_controllers.GallerySwagger'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/nova-cdn_pkg_utils.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/nova-cdn_pkg_utils.Response'
+      security:
+      - BearerAuth: []
+      summary: Restore a gallery item
+      tags:
+      - galleries
   /galleries/upload:
     post:
       consumes:
