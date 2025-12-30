@@ -8,11 +8,10 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
-	"time"
-
 	"os"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/google/uuid"
 )
 
 type GalleryController struct {
@@ -127,7 +126,9 @@ func (ctrl *GalleryController) Upload(c *fiber.Ctx) error {
 	}
 
 	ext := filepath.Ext(file.Filename)
-	newFileName := fmt.Sprintf("%d%s", time.Now().UnixNano(), ext)
+	newUid, err := uuid.NewV7()
+
+	newFileName := fmt.Sprintf("%v%s", newUid.String(), ext)
 	filePath := fmt.Sprintf("images/%s/%s", dir, newFileName)
 	fullPath := "public/" + filePath
 	outputDir := fmt.Sprintf("public/images/%s", dir)
