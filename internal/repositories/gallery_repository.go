@@ -69,3 +69,8 @@ func (r *GalleryRepository) ForceDelete(gallery *models.Gallery) error {
 	err := r.db.Unscoped().Delete(gallery).Error
 	return err
 }
+
+func (r *GalleryRepository) Restore(gallery *models.Gallery) error {
+	err := r.db.Unscoped().Model(gallery).Update("deleted_at", nil).Error
+	return err
+}

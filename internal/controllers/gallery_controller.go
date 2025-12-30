@@ -223,3 +223,35 @@ func (ctrl *GalleryController) ForceDelete(c *fiber.Ctx) error {
 
 	return utils.SuccessResponse(c, "Gallery deleted successfully", gallery)
 }
+
+// Restore godoc
+// @Summary Restore a gallery item
+// @Description Restore a gallery item from the trash
+// @Tags galleries
+// @Accept json
+// @Produce json
+// @Param id path int true "Gallery ID"
+// @Success 200 {object} utils.Response{data=GallerySwagger}
+// @Failure 400 {object} utils.Response
+// @Failure 500 {object} utils.Response
+// @Router /galleries/{id}/restore [post]
+// @Security BearerAuth
+func (ctrl *GalleryController) Restore(c *fiber.Ctx) error {
+	id, err := strconv.Atoi(c.Params("id"))
+
+	if err != nil {
+		return utils.ErrorResponse(c, fiber.StatusBadRequest, "Invalid gallery ID")
+	}
+
+	gallery, err := ctrl.repo.FindByID(uint64(id), true)
+
+	if err != nil {
+		return utils.ErrorResponse(c, fiber.StatusBadRequest, "Gallery not found")
+	}
+
+	if err := ctrl.repo.Restore(gallery); err != nil {
+		return utils.ErrorResponse(c, fiber.StatusInternalServerError, "Failed to restore gallery")
+	}
+
+	return utils.SuccessResponse(c, "Gallery restored successfully", gallery)
+}

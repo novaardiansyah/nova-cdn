@@ -39,5 +39,6 @@ func SetupRoutes(app *fiber.App) {
 	galleries.Get("/", galleryController.Index)
 	galleries.Post("/upload", galleryController.Upload)
 	galleries.Delete("/:id", galleryController.Destroy)
-  galleries.Delete("/:id/force", galleryController.ForceDelete)
+	galleries.Delete("/:id/force", galleryController.ForceDelete)
+	galleries.Post("/:id/restore", galleryController.Restore)
 }
