@@ -22,6 +22,7 @@ type ProcessedImage struct {
 	FileName string
 	FilePath string
 	FileSize uint32
+  Size string
 }
 
 var ImageVersions = []ImageVersion{
@@ -72,6 +73,7 @@ func ProcessImage(inputPath, outputDir, baseName string) ([]ProcessedImage, erro
 			FileName: versionFileName,
 			FilePath: relPath,
 			FileSize: uint32(info.Size()),
+      Size: version.Prefix,
 		})
 	}
 

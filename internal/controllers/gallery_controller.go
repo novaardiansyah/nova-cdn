@@ -174,6 +174,7 @@ func (ctrl *GalleryController) Upload(c *fiber.Ctx) error {
 		FileSize:     uint32(file.Size),
 		Description:  description,
 		IsPrivate:    isPrivate,
+		Size:         "original",
 		HasOptimized: true,
 	}
 
@@ -212,6 +213,7 @@ func (ctrl *GalleryController) Upload(c *fiber.Ctx) error {
 				Description:  description,
 				IsPrivate:    isPrivate,
 				HasOptimized: false,
+				Size:         img.Size,
 			})
 		}
 

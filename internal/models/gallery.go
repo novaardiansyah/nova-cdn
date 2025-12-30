@@ -18,6 +18,7 @@ type Gallery struct {
 	FileSize    uint32         `json:"file_size"`
 	IsPrivate   bool           `json:"is_private"`
 	Description string         `json:"description"`
+	Size        string         `json:"size"`
 	HasOptimized bool          `json:"has_optimized"`
 	CreatedAt   time.Time      `json:"created_at"`
 	UpdatedAt   time.Time      `json:"updated_at"`
