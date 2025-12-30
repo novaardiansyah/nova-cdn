@@ -195,7 +195,7 @@ func (ctrl *GalleryController) Upload(c *fiber.Ctx) error {
 			pSubjectID := subjectID
 			pSubjectType := subjectType
 
-			if dir == "gallery" {
+			if pSubjectID == nil && dir == "gallery" {
 				pSubjectID = &original.ID
 				st := "App\\Models\\Gallery"
 				pSubjectType = &st
