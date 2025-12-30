@@ -292,6 +292,19 @@ paths:
         name: file
         required: true
         type: file
+      - description: Subject ID
+        in: formData
+        name: subject_id
+        type: integer
+      - description: Subject Type
+        in: formData
+        name: subject_type
+        type: string
+      - default: gallery
+        description: Directory name (gallery, payment, item)
+        in: formData
+        name: dir
+        type: string
       - description: Image description
         in: formData
         name: description

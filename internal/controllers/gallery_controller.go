@@ -7,7 +7,10 @@ import (
 	"nova-cdn/pkg/utils"
 	"path/filepath"
 	"strconv"
+	"strings"
 	"time"
+
+	"os"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -18,6 +21,19 @@ type GalleryController struct {
 
 func NewGalleryController(repo *repositories.GalleryRepository) *GalleryController {
 	return &GalleryController{repo: repo}
+}
+
+func toCamelCase(s string) string {
+	if s == "" {
+		return ""
+	}
+	words := strings.Split(s, "_")
+	for i, word := range words {
+		if len(word) > 0 {
+			words[i] = strings.ToUpper(word[:1]) + word[1:]
+		}
+	}
+	return strings.Join(words, "")
 }
 
 // Index godoc
@@ -66,6 +82,9 @@ func (ctrl *GalleryController) Index(c *fiber.Ctx) error {
 // @Accept multipart/form-data
 // @Produce json
 // @Param file formData file true "Image file to upload"
+// @Param subject_id formData int false "Subject ID"
+// @Param subject_type formData string false "Subject Type"
+// @Param dir formData string false "Directory name (gallery, payment, item)" default(gallery)
 // @Param description formData string false "Image description"
 // @Param is_private formData boolean false "Set image as private" default(false)
 // @Success 201 {object} utils.Response{data=[]GallerySwagger}
@@ -96,11 +115,26 @@ func (ctrl *GalleryController) Upload(c *fiber.Ctx) error {
 		return utils.ErrorResponse(c, fiber.StatusBadRequest, "File size exceeds 10MB limit")
 	}
 
+	dir := c.FormValue("dir", "gallery")
+	allowedDirs := map[string]bool{
+		"gallery": true,
+		"payment": true,
+		"item":    true,
+	}
+
+	if !allowedDirs[dir] {
+		return utils.ErrorResponse(c, fiber.StatusBadRequest, "Invalid directory. Allowed: gallery, payment, item")
+	}
+
 	ext := filepath.Ext(file.Filename)
 	newFileName := fmt.Sprintf("%d%s", time.Now().UnixNano(), ext)
-	filePath := "images/gallery/" + newFileName
+	filePath := fmt.Sprintf("images/%s/%s", dir, newFileName)
 	fullPath := "public/" + filePath
-	outputDir := "public/images/gallery"
+	outputDir := fmt.Sprintf("public/images/%s", dir)
+
+	if err := os.MkdirAll(outputDir, 0755); err != nil {
+		return utils.ErrorResponse(c, fiber.StatusInternalServerError, "Failed to create directory")
+	}
 
 	if err := c.SaveFile(file, fullPath); err != nil {
 		return utils.ErrorResponse(c, fiber.StatusInternalServerError, "Failed to save file")
@@ -110,8 +144,30 @@ func (ctrl *GalleryController) Upload(c *fiber.Ctx) error {
 	isPrivate := c.FormValue("is_private", "false") == "true"
 	userID := c.Locals("user_id").(uint)
 
+	subjectIDStr := c.FormValue("subject_id", "")
+	subjectTypeStr := c.FormValue("subject_type", "")
+
+	var subjectID *uint
+	var subjectType *string
+
+	if subjectIDStr != "" {
+		if sid, err := strconv.ParseUint(subjectIDStr, 10, 32); err == nil {
+			usid := uint(sid)
+			subjectID = &usid
+
+			if subjectTypeStr != "" {
+				subjectType = &subjectTypeStr
+			} else {
+				stype := "App\\Models\\" + toCamelCase(dir)
+				subjectType = &stype
+			}
+		}
+	}
+
 	original := &models.Gallery{
 		UserID:       userID,
+		SubjectID:    subjectID,
+		SubjectType:  subjectType,
 		FileName:     newFileName,
 		FilePath:     filePath,
 		FileSize:     uint32(file.Size),
@@ -133,16 +189,24 @@ func (ctrl *GalleryController) Upload(c *fiber.Ctx) error {
 	galleries = append(galleries, original)
 
 	if len(processedImages) > 0 {
-		subjectType := "App\\Models\\Gallery"
 		var processedGalleries []*models.Gallery
 
 		for _, img := range processedImages {
+			pSubjectID := subjectID
+			pSubjectType := subjectType
+
+			if dir == "gallery" {
+				pSubjectID = &original.ID
+				st := "App\\Models\\Gallery"
+				pSubjectType = &st
+			}
+
 			processedGalleries = append(processedGalleries, &models.Gallery{
 				UserID:       userID,
-				SubjectID:    &original.ID,
-				SubjectType:  &subjectType,
+				SubjectID:    pSubjectID,
+				SubjectType:  pSubjectType,
 				FileName:     img.FileName,
-				FilePath:     img.FilePath,
+				FilePath:     fmt.Sprintf("images/%s/%s", dir, img.FileName),
 				FileSize:     img.FileSize,
 				Description:  description,
 				IsPrivate:    isPrivate,

@@ -174,6 +174,25 @@ const docTemplate = `{
                         "required": true
                     },
                     {
+                        "type": "integer",
+                        "description": "Subject ID",
+                        "name": "subject_id",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Subject Type",
+                        "name": "subject_type",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "default": "gallery",
+                        "description": "Directory name (gallery, payment, item)",
+                        "name": "dir",
+                        "in": "formData"
+                    },
+                    {
                         "type": "string",
                         "description": "Image description",
                         "name": "description",
