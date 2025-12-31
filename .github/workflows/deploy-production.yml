@@ -27,9 +27,9 @@ jobs:
             git fetch origin
             git checkout production
             git pull origin production
-
+            
             chmod +x ./setup.sh
             sed -i 's/\r$//' setup.sh && bash setup.sh
-            
+
             echo "[GITHUB ACTION] All task has been executed successfully..."
             

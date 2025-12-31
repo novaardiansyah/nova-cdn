@@ -9,13 +9,12 @@ echo "--> Preparing directories..."
 mkdir -p logs
 touch logs/golang.log logs/golang-error.log 2>/dev/null || true
 
-echo "--> Setting default permissions..."
+echo "--> Setting permissions..."
 sudo chown -R www:www . 2>/dev/null || true
-sudo find . -type d -exec chmod 755 {} \; 2>/dev/null || true
-sudo find . -type f -exec chmod 644 {} \; 2>/dev/null || true
+sudo find . \( -path ./node_modules -o -path ./vendor \) -prune -o -type d -exec chmod 755 {} \;
+sudo find . \( -path ./node_modules -o -path ./vendor \) -prune -o -type f -exec chmod 644 {} \;
 
-echo "--> Binary permission..."
-sudo chown www:www runner-app
+echo "--> Setting writable permissions..."
 sudo chmod 755 runner-app
 
 echo "--> Supervisor setup..."
@@ -25,7 +24,7 @@ sudo supervisorctl reread
 sudo supervisorctl update
 sudo supervisorctl restart nova-cdn_novadev_myid
 
-echo "--> Securing env files..."
-sudo chmod 600 .env .env.local .env.production artisan .well-known .git Makefile setup.sh 2>/dev/null
+echo "--> Securing credentials files..."
+sudo chmod 600 .env .env.local .env.production .well-known .git artisan Makefile setup.sh 2>/dev/null
 
 echo "[setup.sh] Script has been executed successfully..."
