@@ -102,3 +102,16 @@ func (r *GalleryRepository) Restore(gallery *models.Gallery) error {
 	err := r.db.Unscoped().Model(gallery).Update("deleted_at", nil).Error
 	return err
 }
+
+func (r *GalleryRepository) FindByGroupCode(groupCode string, size string) ([]models.Gallery, error) {
+	var galleries []models.Gallery
+	query := r.db.Where("group_code = ?", groupCode)
+
+	if size != "" {
+		query = query.Where("size = ?", size)
+	}
+
+	err := query.Find(&galleries).Error
+
+	return galleries, err
+}

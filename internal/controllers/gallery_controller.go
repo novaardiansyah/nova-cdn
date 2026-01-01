@@ -46,6 +46,7 @@ func toCamelCase(s string) string {
 // @Param per_page query int false "Items per page" default(10)
 // @Param subject_id query string false "Subject ID"
 // @Param subject_type query string false "Subject Type"
+// @Param size query string false "Size (original, small, medium, large)"
 // @Success 200 {object} utils.PaginatedResponse{data=[]GallerySwagger}
 // @Failure 400 {object} utils.Response
 // @Router /galleries [get]
@@ -354,4 +355,30 @@ func (ctrl *GalleryController) Show(c *fiber.Ctx) error {
 	}
 
 	return utils.SuccessResponse(c, "Gallery retrieved successfully", gallery)
+}
+
+// ShowByGroupCode godoc
+// @Summary Show galleries by group code
+// @Description Show galleries by group code
+// @Tags galleries
+// @Accept json
+// @Produce json
+// @Param group_code path string true "Group Code"
+// @Param size query string false "Size (original, small, medium, large)"
+// @Success 200 {object} utils.Response{data=GallerySwagger}
+// @Failure 400 {object} utils.Response
+// @Failure 500 {object} utils.Response
+// @Router /galleries/{group_code} [get]
+// @Security BearerAuth
+func (ctrl *GalleryController) ShowByGroupCode(c *fiber.Ctx) error {
+	groupCode := c.Params("group_code")
+	size := c.Query("size", "")
+
+	galleries, err := ctrl.repo.FindByGroupCode(groupCode, size)
+
+	if err != nil {
+		return utils.ErrorResponse(c, fiber.StatusBadRequest, "Gallery not found")
+	}
+
+	return utils.SuccessResponse(c, "Galleries retrieved successfully", galleries)
 }

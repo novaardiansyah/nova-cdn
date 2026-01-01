@@ -40,8 +40,9 @@ func SetupRoutes(app *fiber.App) {
 	galleries := api.Group("/galleries", middleware.Auth())
 	galleries.Get("/", galleryController.Index)
 	galleries.Post("/upload", galleryController.Upload)
-	galleries.Get("/:id", galleryController.Show)
-	galleries.Delete("/:id", galleryController.Destroy)
-	galleries.Delete("/:id/force", galleryController.ForceDelete)
-	galleries.Post("/:id/restore", galleryController.Restore)
+	galleries.Get("/:id<int>", galleryController.Show)
+	galleries.Get("/:group_code<string>", galleryController.ShowByGroupCode)
+	galleries.Delete("/:id<int>", galleryController.Destroy)
+	galleries.Delete("/:id<int>/force", galleryController.ForceDelete)
+	galleries.Post("/:id<int>/restore", galleryController.Restore)
 }

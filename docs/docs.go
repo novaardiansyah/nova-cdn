@@ -126,6 +126,12 @@ const docTemplate = `{
                         "description": "Subject Type",
                         "name": "subject_type",
                         "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Size (original, small, medium, large)",
+                        "name": "size",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -234,6 +240,73 @@ const docTemplate = `{
                                             "items": {
                                                 "$ref": "#/definitions/internal_controllers.GallerySwagger"
                                             }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/nova-cdn_pkg_utils.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/nova-cdn_pkg_utils.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/galleries/{group_code}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Show galleries by group code",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "galleries"
+                ],
+                "summary": "Show galleries by group code",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Group Code",
+                        "name": "group_code",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Size (original, small, medium, large)",
+                        "name": "size",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/nova-cdn_pkg_utils.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/internal_controllers.GallerySwagger"
                                         }
                                     }
                                 }
