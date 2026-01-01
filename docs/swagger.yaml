@@ -186,6 +186,40 @@ paths:
       tags:
       - galleries
   /galleries/{group_code}:
+    delete:
+      consumes:
+      - application/json
+      description: Soft delete all galleries with the specified group code
+      parameters:
+      - description: Group Code
+        in: path
+        name: group_code
+        required: true
+        type: string
+      - description: Size (original, small, medium, large)
+        in: query
+        name: size
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/nova-cdn_pkg_utils.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/nova-cdn_pkg_utils.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/nova-cdn_pkg_utils.Response'
+      security:
+      - BearerAuth: []
+      summary: Soft delete galleries by group code
+      tags:
+      - galleries
     get:
       consumes:
       - application/json

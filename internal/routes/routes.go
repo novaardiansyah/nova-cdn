@@ -43,6 +43,7 @@ func SetupRoutes(app *fiber.App) {
 	galleries.Get("/:id<int>", galleryController.Show)
 	galleries.Get("/:group_code<string>", galleryController.ShowByGroupCode)
 	galleries.Delete("/:id<int>", galleryController.Destroy)
+	galleries.Delete("/:group_code<string>", galleryController.DestroyByGroupCode)
 	galleries.Delete("/:id<int>/force", galleryController.ForceDelete)
 	galleries.Post("/:id<int>/restore", galleryController.Restore)
 }

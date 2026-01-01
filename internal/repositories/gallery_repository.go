@@ -115,3 +115,13 @@ func (r *GalleryRepository) FindByGroupCode(groupCode string, size string) ([]mo
 
 	return galleries, err
 }
+
+func (r *GalleryRepository) DeleteByGroupCode(groupCode string, size string) error {
+	query := r.db.Where("group_code = ?", groupCode)
+
+	if size != "" {
+		query = query.Where("size = ?", size)
+	}
+
+	return query.Delete(&models.Gallery{}).Error
+}

@@ -382,3 +382,27 @@ func (ctrl *GalleryController) ShowByGroupCode(c *fiber.Ctx) error {
 
 	return utils.SuccessResponse(c, "Galleries retrieved successfully", galleries)
 }
+
+// DestroyByGroupCode godoc
+// @Summary Soft delete galleries by group code
+// @Description Soft delete all galleries with the specified group code
+// @Tags galleries
+// @Accept json
+// @Produce json
+// @Param group_code path string true "Group Code"
+// @Param size query string false "Size (original, small, medium, large)"
+// @Success 200 {object} utils.Response
+// @Failure 400 {object} utils.Response
+// @Failure 500 {object} utils.Response
+// @Router /galleries/{group_code} [delete]
+// @Security BearerAuth
+func (ctrl *GalleryController) DestroyByGroupCode(c *fiber.Ctx) error {
+	groupCode := c.Params("group_code")
+	size := c.Query("size", "")
+
+	if err := ctrl.repo.DeleteByGroupCode(groupCode, size); err != nil {
+		return utils.ErrorResponse(c, fiber.StatusInternalServerError, "Failed to delete galleries")
+	}
+
+	return utils.SuccessResponse(c, "Galleries deleted successfully", nil)
+}
