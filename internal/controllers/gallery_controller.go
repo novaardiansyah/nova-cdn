@@ -207,19 +207,10 @@ func (ctrl *GalleryController) Upload(c *fiber.Ctx) error {
 		var processedGalleries []*models.Gallery
 
 		for _, img := range processedImages {
-			pSubjectID := subjectID
-			pSubjectType := subjectType
-
-			if pSubjectID == nil && dir == "gallery" {
-				pSubjectID = &original.ID
-				st := "App\\Models\\Gallery"
-				pSubjectType = &st
-			}
-
 			processedGalleries = append(processedGalleries, &models.Gallery{
 				UserID:       userID,
-				SubjectID:    pSubjectID,
-				SubjectType:  pSubjectType,
+				SubjectID:    subjectID,
+				SubjectType:  subjectType,
 				FileName:     img.FileName,
 				FilePath:     fmt.Sprintf("images/%s/%s", dir, img.FileName),
 				FileSize:     img.FileSize,
