@@ -15,11 +15,12 @@ import (
 )
 
 type GalleryController struct {
-	repo *repositories.GalleryRepository
+	repo    *repositories.GalleryRepository
+	genRepo *repositories.GenerateRepository
 }
 
-func NewGalleryController(repo *repositories.GalleryRepository) *GalleryController {
-	return &GalleryController{repo: repo}
+func NewGalleryController(repo *repositories.GalleryRepository, genRepo *repositories.GenerateRepository) *GalleryController {
+	return &GalleryController{repo: repo, genRepo: genRepo}
 }
 
 func toCamelCase(s string) string {
@@ -54,6 +55,7 @@ func (ctrl *GalleryController) Index(c *fiber.Ctx) error {
 	perPage, _ := strconv.Atoi(c.Query("per_page", "10"))
 	subject_id := c.Query("subject_id", "")
 	subject_type := c.Query("subject_type", "")
+	size := c.Query("size", "")
 
 	if page < 1 {
 		page = 1
@@ -63,13 +65,13 @@ func (ctrl *GalleryController) Index(c *fiber.Ctx) error {
 		perPage = 10
 	}
 
-	total, err := ctrl.repo.Count(subject_id, subject_type)
+	total, err := ctrl.repo.Count(subject_id, subject_type, size)
 
 	if err != nil {
 		return utils.ErrorResponse(c, fiber.StatusBadRequest, "Failed to count galleries")
 	}
 
-	galleries, err := ctrl.repo.FindAllPaginated(page, perPage, subject_id, subject_type)
+	galleries, err := ctrl.repo.FindAllPaginated(page, perPage, subject_id, subject_type, size)
 
 	if err != nil {
 		return utils.ErrorResponse(c, fiber.StatusBadRequest, "Failed to retrieve galleries")
@@ -173,6 +175,8 @@ func (ctrl *GalleryController) Upload(c *fiber.Ctx) error {
 		}
 	}
 
+	groupCode := utils.GetCode(ctrl.genRepo, "gallery_group", true)
+
 	original := &models.Gallery{
 		UserID:       userID,
 		SubjectID:    subjectID,
@@ -184,6 +188,7 @@ func (ctrl *GalleryController) Upload(c *fiber.Ctx) error {
 		IsPrivate:    isPrivate,
 		Size:         "original",
 		HasOptimized: true,
+		GroupCode:    groupCode,
 	}
 
 	if err := ctrl.repo.Create(original); err != nil {
@@ -222,6 +227,7 @@ func (ctrl *GalleryController) Upload(c *fiber.Ctx) error {
 				IsPrivate:    isPrivate,
 				HasOptimized: false,
 				Size:         img.Size,
+				GroupCode:    groupCode,
 			})
 		}
 
@@ -329,4 +335,32 @@ func (ctrl *GalleryController) Restore(c *fiber.Ctx) error {
 	}
 
 	return utils.SuccessResponse(c, "Gallery restored successfully", gallery)
+}
+
+// Show godoc
+// @Summary Show a gallery item
+// @Description Show a gallery item
+// @Tags galleries
+// @Accept json
+// @Produce json
+// @Param id path int true "Gallery ID"
+// @Success 200 {object} utils.Response{data=GallerySwagger}
+// @Failure 400 {object} utils.Response
+// @Failure 500 {object} utils.Response
+// @Router /galleries/{id} [get]
+// @Security BearerAuth
+func (ctrl *GalleryController) Show(c *fiber.Ctx) error {
+	id, err := strconv.Atoi(c.Params("id"))
+
+	if err != nil {
+		return utils.ErrorResponse(c, fiber.StatusBadRequest, "Invalid gallery ID")
+	}
+
+	gallery, err := ctrl.repo.FindByID(uint64(id), false)
+
+	if err != nil {
+		return utils.ErrorResponse(c, fiber.StatusBadRequest, "Gallery not found")
+	}
+
+	return utils.SuccessResponse(c, "Gallery retrieved successfully", gallery)
 }

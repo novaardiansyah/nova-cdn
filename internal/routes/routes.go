@@ -33,11 +33,14 @@ func SetupRoutes(app *fiber.App) {
 	auth.Post("/login", authController.Login)
 
 	galleryRepo := repositories.NewGalleryRepository(db)
-	galleryController := controllers.NewGalleryController(galleryRepo)
+	genRepo := repositories.NewGenerateRepository(db)
+
+	galleryController := controllers.NewGalleryController(galleryRepo, genRepo)
 
 	galleries := api.Group("/galleries", middleware.Auth())
 	galleries.Get("/", galleryController.Index)
 	galleries.Post("/upload", galleryController.Upload)
+	galleries.Get("/:id", galleryController.Show)
 	galleries.Delete("/:id", galleryController.Destroy)
 	galleries.Delete("/:id/force", galleryController.ForceDelete)
 	galleries.Post("/:id/restore", galleryController.Restore)
