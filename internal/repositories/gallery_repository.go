@@ -14,16 +14,30 @@ func NewGalleryRepository(db *gorm.DB) *GalleryRepository {
 	return &GalleryRepository{db: db}
 }
 
-func (r *GalleryRepository) FindAllPaginated(page, limit int) ([]models.Gallery, error) {
+func (r *GalleryRepository) FindAllPaginated(page, limit int, subject_id string, subject_type string) ([]models.Gallery, error) {
 	var galleries []models.Gallery
 	offset := (page - 1) * limit
-	err := r.db.Offset(offset).Limit(limit).Find(&galleries).Error
+	query := r.db.Offset(offset).Limit(limit)
+	if subject_id != "" {
+		query = query.Where("subject_id = ?", subject_id)
+	}
+	if subject_type != "" {
+		query = query.Where("subject_type = ?", subject_type)
+	}
+	err := query.Find(&galleries).Error
 	return galleries, err
 }
 
-func (r *GalleryRepository) Count() (int64, error) {
+func (r *GalleryRepository) Count(subject_id string, subject_type string) (int64, error) {
 	var count int64
-	err := r.db.Model(&models.Gallery{}).Count(&count).Error
+	query := r.db.Model(&models.Gallery{})
+	if subject_id != "" {
+		query = query.Where("subject_id = ?", subject_id)
+	}
+	if subject_type != "" {
+		query = query.Where("subject_type = ?", subject_type)
+	}
+	err := query.Count(&count).Error
 	return count, err
 }
 

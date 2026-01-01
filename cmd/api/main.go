@@ -72,7 +72,7 @@ func main() {
 	addr := ":" + config.AppPort
 
 	if os.Getenv("APP_ENV") == "production" {
-		addr = "127.0.0.1:" + config.AppPort
+		addr = "100.107.79.17:" + config.AppPort
 	}
 
 	log.Printf("Server starting on %s...\n", addr)

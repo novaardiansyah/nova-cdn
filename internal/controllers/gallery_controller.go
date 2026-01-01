@@ -5,10 +5,10 @@ import (
 	"nova-cdn/internal/models"
 	"nova-cdn/internal/repositories"
 	"nova-cdn/pkg/utils"
+	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
-	"os"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
@@ -43,6 +43,8 @@ func toCamelCase(s string) string {
 // @Produce json
 // @Param page query int false "Page number" default(1)
 // @Param per_page query int false "Items per page" default(10)
+// @Param subject_id query string false "Subject ID"
+// @Param subject_type query string false "Subject Type"
 // @Success 200 {object} utils.PaginatedResponse{data=[]GallerySwagger}
 // @Failure 400 {object} utils.Response
 // @Router /galleries [get]
@@ -50,6 +52,8 @@ func toCamelCase(s string) string {
 func (ctrl *GalleryController) Index(c *fiber.Ctx) error {
 	page, _ := strconv.Atoi(c.Query("page", "1"))
 	perPage, _ := strconv.Atoi(c.Query("per_page", "10"))
+	subject_id := c.Query("subject_id", "")
+	subject_type := c.Query("subject_type", "")
 
 	if page < 1 {
 		page = 1
@@ -59,16 +63,20 @@ func (ctrl *GalleryController) Index(c *fiber.Ctx) error {
 		perPage = 10
 	}
 
-	total, err := ctrl.repo.Count()
+	total, err := ctrl.repo.Count(subject_id, subject_type)
 
 	if err != nil {
 		return utils.ErrorResponse(c, fiber.StatusBadRequest, "Failed to count galleries")
 	}
 
-	galleries, err := ctrl.repo.FindAllPaginated(page, perPage)
+	galleries, err := ctrl.repo.FindAllPaginated(page, perPage, subject_id, subject_type)
 
 	if err != nil {
 		return utils.ErrorResponse(c, fiber.StatusBadRequest, "Failed to retrieve galleries")
+	}
+
+	if len(galleries) < 1 {
+		return utils.ErrorResponse(c, fiber.StatusNotFound, "No galleries found")
 	}
 
 	return utils.PaginatedSuccessResponse(c, "Galleries retrieved successfully", galleries, page, perPage, total, len(galleries))
