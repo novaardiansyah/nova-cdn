@@ -4,6 +4,16 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
+type SimpleResponse struct {
+	Success bool   `json:"success" example:"true"`
+	Message string `json:"message"`
+}
+
+type ErrorSimpleResponse struct {
+	Success bool   `json:"success" example:"false"`
+	Message string `json:"message"`
+}
+
 type Response struct {
 	Success bool        `json:"success"`
 	Message string      `json:"message"`
@@ -11,8 +21,8 @@ type Response struct {
 }
 
 type ValidationErrorResponse struct {
-	Success bool                `json:"success"`
-	Message string              `json:"message"`
+	Success bool                `json:"success" example:"false"`
+	Message string              `json:"message" example:"Validation error"`
 	Errors  map[string][]string `json:"errors"`
 }
 
@@ -40,6 +50,13 @@ func SuccessResponse(c *fiber.Ctx, message string, data interface{}) error {
 	})
 }
 
+func SimpleSuccessResponse(c *fiber.Ctx, message string) error {
+	return c.Status(fiber.StatusOK).JSON(SimpleResponse{
+		Success: true,
+		Message: message,
+	})
+}
+
 func CreatedResponse(c *fiber.Ctx, message string, data interface{}) error {
 	return c.Status(fiber.StatusCreated).JSON(Response{
 		Success: true,
@@ -49,7 +66,7 @@ func CreatedResponse(c *fiber.Ctx, message string, data interface{}) error {
 }
 
 func ErrorResponse(c *fiber.Ctx, statusCode int, message string) error {
-	return c.Status(statusCode).JSON(Response{
+	return c.Status(statusCode).JSON(SimpleResponse{
 		Success: false,
 		Message: message,
 	})

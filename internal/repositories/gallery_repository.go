@@ -125,3 +125,22 @@ func (r *GalleryRepository) DeleteByGroupCode(groupCode string, size string) err
 
 	return query.Delete(&models.Gallery{}).Error
 }
+
+func (r *GalleryRepository) ForceDeleteByGroupCode(groupCode string, size string) ([]models.Gallery, error) {
+	var galleries []models.Gallery
+	query := r.db.Unscoped().Where("group_code = ?", groupCode)
+
+	if size != "" {
+		query = query.Where("size = ?", size)
+	}
+
+	if err := query.Find(&galleries).Error; err != nil {
+		return nil, err
+	}
+
+	if err := query.Delete(&models.Gallery{}).Error; err != nil {
+		return nil, err
+	}
+
+	return galleries, nil
+}

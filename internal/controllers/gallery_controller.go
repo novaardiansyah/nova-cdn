@@ -48,7 +48,7 @@ func toCamelCase(s string) string {
 // @Param subject_type query string false "Subject Type"
 // @Param size query string false "Size (original, small, medium, large)"
 // @Success 200 {object} utils.PaginatedResponse{data=[]GallerySwagger}
-// @Failure 400 {object} utils.Response
+// @Failure 400 {object} utils.ErrorSimpleResponse
 // @Router /galleries [get]
 // @Security BearerAuth
 func (ctrl *GalleryController) Index(c *fiber.Ctx) error {
@@ -98,8 +98,8 @@ func (ctrl *GalleryController) Index(c *fiber.Ctx) error {
 // @Param description formData string false "Image description"
 // @Param is_private formData boolean false "Set image as private" default(false)
 // @Success 201 {object} utils.Response{data=[]GallerySwagger}
-// @Failure 400 {object} utils.Response
-// @Failure 500 {object} utils.Response
+// @Failure 400 {object} utils.ErrorSimpleResponse
+// @Failure 500 {object} utils.ErrorSimpleResponse
 // @Router /galleries/upload [post]
 // @Security BearerAuth
 func (ctrl *GalleryController) Upload(c *fiber.Ctx) error {
@@ -240,9 +240,9 @@ func (ctrl *GalleryController) Upload(c *fiber.Ctx) error {
 // @Accept json
 // @Produce json
 // @Param id path int true "Gallery ID"
-// @Success 200 {object} utils.Response{data=GallerySwagger}
-// @Failure 400 {object} utils.Response
-// @Failure 500 {object} utils.Response
+// @Success 200 {object} utils.SimpleResponse
+// @Failure 400 {object} utils.ErrorSimpleResponse
+// @Failure 500 {object} utils.ErrorSimpleResponse
 // @Router /galleries/{id} [delete]
 // @Security BearerAuth
 func (ctrl *GalleryController) Destroy(c *fiber.Ctx) error {
@@ -261,7 +261,7 @@ func (ctrl *GalleryController) Destroy(c *fiber.Ctx) error {
 		return utils.ErrorResponse(c, fiber.StatusInternalServerError, "Failed to delete gallery")
 	}
 
-	return utils.SuccessResponse(c, "Gallery deleted successfully", gallery)
+	return utils.SimpleSuccessResponse(c, "Gallery deleted successfully")
 }
 
 // ForceDelete godoc
@@ -271,9 +271,9 @@ func (ctrl *GalleryController) Destroy(c *fiber.Ctx) error {
 // @Accept json
 // @Produce json
 // @Param id path int true "Gallery ID"
-// @Success 200 {object} utils.Response{data=GallerySwagger}
-// @Failure 400 {object} utils.Response
-// @Failure 500 {object} utils.Response
+// @Success 200 {object} utils.SimpleResponse
+// @Failure 400 {object} utils.ErrorSimpleResponse
+// @Failure 500 {object} utils.ErrorSimpleResponse
 // @Router /galleries/{id}/force [delete]
 // @Security BearerAuth
 func (ctrl *GalleryController) ForceDelete(c *fiber.Ctx) error {
@@ -294,7 +294,7 @@ func (ctrl *GalleryController) ForceDelete(c *fiber.Ctx) error {
 
 	utils.RemoveImageFiles(gallery.FilePath)
 
-	return utils.SuccessResponse(c, "Gallery deleted successfully", gallery)
+	return utils.SimpleSuccessResponse(c, "Gallery deleted successfully")
 }
 
 // Restore godoc
@@ -305,8 +305,8 @@ func (ctrl *GalleryController) ForceDelete(c *fiber.Ctx) error {
 // @Produce json
 // @Param id path int true "Gallery ID"
 // @Success 200 {object} utils.Response{data=GallerySwagger}
-// @Failure 400 {object} utils.Response
-// @Failure 500 {object} utils.Response
+// @Failure 400 {object} utils.ErrorSimpleResponse
+// @Failure 500 {object} utils.ErrorSimpleResponse
 // @Router /galleries/{id}/restore [post]
 // @Security BearerAuth
 func (ctrl *GalleryController) Restore(c *fiber.Ctx) error {
@@ -337,8 +337,8 @@ func (ctrl *GalleryController) Restore(c *fiber.Ctx) error {
 // @Produce json
 // @Param id path int true "Gallery ID"
 // @Success 200 {object} utils.Response{data=GallerySwagger}
-// @Failure 400 {object} utils.Response
-// @Failure 500 {object} utils.Response
+// @Failure 400 {object} utils.ErrorSimpleResponse
+// @Failure 500 {object} utils.ErrorSimpleResponse
 // @Router /galleries/{id} [get]
 // @Security BearerAuth
 func (ctrl *GalleryController) Show(c *fiber.Ctx) error {
@@ -366,8 +366,8 @@ func (ctrl *GalleryController) Show(c *fiber.Ctx) error {
 // @Param group_code path string true "Group Code"
 // @Param size query string false "Size (original, small, medium, large)"
 // @Success 200 {object} utils.Response{data=GallerySwagger}
-// @Failure 400 {object} utils.Response
-// @Failure 500 {object} utils.Response
+// @Failure 400 {object} utils.ErrorSimpleResponse
+// @Failure 500 {object} utils.ErrorSimpleResponse
 // @Router /galleries/{group_code} [get]
 // @Security BearerAuth
 func (ctrl *GalleryController) ShowByGroupCode(c *fiber.Ctx) error {
@@ -391,9 +391,9 @@ func (ctrl *GalleryController) ShowByGroupCode(c *fiber.Ctx) error {
 // @Produce json
 // @Param group_code path string true "Group Code"
 // @Param size query string false "Size (original, small, medium, large)"
-// @Success 200 {object} utils.Response
-// @Failure 400 {object} utils.Response
-// @Failure 500 {object} utils.Response
+// @Success 200 {object} utils.SimpleResponse
+// @Failure 400 {object} utils.ErrorSimpleResponse
+// @Failure 500 {object} utils.ErrorSimpleResponse
 // @Router /galleries/{group_code} [delete]
 // @Security BearerAuth
 func (ctrl *GalleryController) DestroyByGroupCode(c *fiber.Ctx) error {
@@ -404,5 +404,34 @@ func (ctrl *GalleryController) DestroyByGroupCode(c *fiber.Ctx) error {
 		return utils.ErrorResponse(c, fiber.StatusInternalServerError, "Failed to delete galleries")
 	}
 
-	return utils.SuccessResponse(c, "Galleries deleted successfully", nil)
+	return utils.SimpleSuccessResponse(c, "Galleries deleted successfully")
+}
+
+// ForceDeleteByGroupCode godoc
+// @Summary Permanently delete galleries by group code
+// @Description Permanently delete all galleries with the specified group code
+// @Tags galleries
+// @Accept json
+// @Produce json
+// @Param group_code path string true "Group Code"
+// @Param size query string false "Size (original, small, medium, large)"
+// @Success 200 {object} utils.SimpleResponse
+// @Failure 400 {object} utils.ErrorSimpleResponse
+// @Failure 500 {object} utils.ErrorSimpleResponse
+// @Router /galleries/{group_code}/force [delete]
+// @Security BearerAuth
+func (ctrl *GalleryController) ForceDeleteByGroupCode(c *fiber.Ctx) error {
+	groupCode := c.Params("group_code")
+	size := c.Query("size", "")
+
+	galleries, err := ctrl.repo.ForceDeleteByGroupCode(groupCode, size)
+	if err != nil {
+		return utils.ErrorResponse(c, fiber.StatusInternalServerError, "Failed to delete galleries")
+	}
+
+	for _, gallery := range galleries {
+		utils.RemoveImageFiles(gallery.FilePath)
+	}
+
+	return utils.SimpleSuccessResponse(c, "Galleries deleted successfully")
 }

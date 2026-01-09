@@ -41,7 +41,7 @@ type LoginResponse struct {
 // @Produce json
 // @Param login body LoginRequest true "Login credentials"
 // @Success 200 {object} utils.Response{data=LoginResponse}
-// @Failure 401 {object} utils.Response
+// @Failure 401 {object} utils.ErrorSimpleResponse
 // @Failure 422 {object} utils.ValidationErrorResponse
 // @Router /auth/login [post]
 func (ctrl *AuthController) Login(c *fiber.Ctx) error {

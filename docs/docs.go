@@ -70,7 +70,7 @@ const docTemplate = `{
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/nova-cdn_pkg_utils.Response"
+                            "$ref": "#/definitions/nova-cdn_pkg_utils.ErrorSimpleResponse"
                         }
                     },
                     "422": {
@@ -159,7 +159,7 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/nova-cdn_pkg_utils.Response"
+                            "$ref": "#/definitions/nova-cdn_pkg_utils.ErrorSimpleResponse"
                         }
                     }
                 }
@@ -249,13 +249,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/nova-cdn_pkg_utils.Response"
+                            "$ref": "#/definitions/nova-cdn_pkg_utils.ErrorSimpleResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/nova-cdn_pkg_utils.Response"
+                            "$ref": "#/definitions/nova-cdn_pkg_utils.ErrorSimpleResponse"
                         }
                     }
                 }
@@ -316,13 +316,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/nova-cdn_pkg_utils.Response"
+                            "$ref": "#/definitions/nova-cdn_pkg_utils.ErrorSimpleResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/nova-cdn_pkg_utils.Response"
+                            "$ref": "#/definitions/nova-cdn_pkg_utils.ErrorSimpleResponse"
                         }
                     }
                 }
@@ -363,19 +363,74 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/nova-cdn_pkg_utils.Response"
+                            "$ref": "#/definitions/nova-cdn_pkg_utils.SimpleResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/nova-cdn_pkg_utils.Response"
+                            "$ref": "#/definitions/nova-cdn_pkg_utils.ErrorSimpleResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/nova-cdn_pkg_utils.Response"
+                            "$ref": "#/definitions/nova-cdn_pkg_utils.ErrorSimpleResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/galleries/{group_code}/force": {
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Permanently delete all galleries with the specified group code",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "galleries"
+                ],
+                "summary": "Permanently delete galleries by group code",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Group Code",
+                        "name": "group_code",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Size (original, small, medium, large)",
+                        "name": "size",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/nova-cdn_pkg_utils.SimpleResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/nova-cdn_pkg_utils.ErrorSimpleResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/nova-cdn_pkg_utils.ErrorSimpleResponse"
                         }
                     }
                 }
@@ -430,13 +485,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/nova-cdn_pkg_utils.Response"
+                            "$ref": "#/definitions/nova-cdn_pkg_utils.ErrorSimpleResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/nova-cdn_pkg_utils.Response"
+                            "$ref": "#/definitions/nova-cdn_pkg_utils.ErrorSimpleResponse"
                         }
                     }
                 }
@@ -471,31 +526,19 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/nova-cdn_pkg_utils.Response"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/definitions/internal_controllers.GallerySwagger"
-                                        }
-                                    }
-                                }
-                            ]
+                            "$ref": "#/definitions/nova-cdn_pkg_utils.SimpleResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/nova-cdn_pkg_utils.Response"
+                            "$ref": "#/definitions/nova-cdn_pkg_utils.ErrorSimpleResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/nova-cdn_pkg_utils.Response"
+                            "$ref": "#/definitions/nova-cdn_pkg_utils.ErrorSimpleResponse"
                         }
                     }
                 }
@@ -532,31 +575,19 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/nova-cdn_pkg_utils.Response"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/definitions/internal_controllers.GallerySwagger"
-                                        }
-                                    }
-                                }
-                            ]
+                            "$ref": "#/definitions/nova-cdn_pkg_utils.SimpleResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/nova-cdn_pkg_utils.Response"
+                            "$ref": "#/definitions/nova-cdn_pkg_utils.ErrorSimpleResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/nova-cdn_pkg_utils.Response"
+                            "$ref": "#/definitions/nova-cdn_pkg_utils.ErrorSimpleResponse"
                         }
                     }
                 }
@@ -611,13 +642,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/nova-cdn_pkg_utils.Response"
+                            "$ref": "#/definitions/nova-cdn_pkg_utils.ErrorSimpleResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/nova-cdn_pkg_utils.Response"
+                            "$ref": "#/definitions/nova-cdn_pkg_utils.ErrorSimpleResponse"
                         }
                     }
                 }
@@ -684,6 +715,18 @@ const docTemplate = `{
                 }
             }
         },
+        "nova-cdn_pkg_utils.ErrorSimpleResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                },
+                "success": {
+                    "type": "boolean",
+                    "example": false
+                }
+            }
+        },
         "nova-cdn_pkg_utils.Meta": {
             "type": "object",
             "properties": {
@@ -734,6 +777,18 @@ const docTemplate = `{
                 }
             }
         },
+        "nova-cdn_pkg_utils.SimpleResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                },
+                "success": {
+                    "type": "boolean",
+                    "example": true
+                }
+            }
+        },
         "nova-cdn_pkg_utils.ValidationErrorResponse": {
             "type": "object",
             "properties": {
@@ -747,10 +802,12 @@ const docTemplate = `{
                     }
                 },
                 "message": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "Validation error"
                 },
                 "success": {
-                    "type": "boolean"
+                    "type": "boolean",
+                    "example": false
                 }
             }
         }
