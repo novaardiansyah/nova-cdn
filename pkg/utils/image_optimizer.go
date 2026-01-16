@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	"github.com/nfnt/resize"
+	_ "golang.org/x/image/webp"
 )
 
 type ImageVersion struct {
@@ -22,7 +23,7 @@ type ProcessedImage struct {
 	FileName string
 	FilePath string
 	FileSize uint32
-  Size string
+	Size     string
 }
 
 var ImageVersions = []ImageVersion{
@@ -73,7 +74,7 @@ func ProcessImage(inputPath, outputDir, baseName string) ([]ProcessedImage, erro
 			FileName: versionFileName,
 			FilePath: relPath,
 			FileSize: uint32(info.Size()),
-      Size: version.Prefix,
+			Size:     version.Prefix,
 		})
 	}
 

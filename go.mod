@@ -11,6 +11,7 @@ require (
 	github.com/swaggo/swag v1.16.4
 	github.com/thedevsaddam/govalidator v1.9.10
 	golang.org/x/crypto v0.46.0
+	golang.org/x/image v0.27.0
 	gorm.io/driver/mysql v1.6.0
 	gorm.io/gorm v1.31.1
 )
