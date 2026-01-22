@@ -13,6 +13,7 @@ import (
 func SetupRoutes(app *fiber.App) {
 	db := config.GetDB()
 
+	app.Use(middleware.GlobalLimiter())
 	app.Static("/", "./public")
 
 	userRepo := repositories.NewUserRepository(db)
@@ -30,6 +31,8 @@ func SetupRoutes(app *fiber.App) {
 	})
 
 	auth := api.Group("/auth")
+
+	auth.Use(middleware.AuthLimiter())
 	auth.Post("/login", authController.Login)
 
 	galleryRepo := repositories.NewGalleryRepository(db)
@@ -43,10 +46,10 @@ func SetupRoutes(app *fiber.App) {
 	galleries.Get("/:id<int>", galleryController.Show)
 	galleries.Get("/:group_code<string>", galleryController.ShowByGroupCode)
 
-  galleries.Post("/:id<int>/restore", galleryController.Restore)
+	galleries.Post("/:id<int>/restore", galleryController.Restore)
 
 	galleries.Delete("/:id<int>", galleryController.Destroy)
 	galleries.Delete("/:group_code<string>", galleryController.DestroyByGroupCode)
 	galleries.Delete("/:id<int>/force", galleryController.ForceDelete)
-  galleries.Delete("/:group_code<string>/force", galleryController.ForceDeleteByGroupCode)
+	galleries.Delete("/:group_code<string>/force", galleryController.ForceDeleteByGroupCode)
 }
