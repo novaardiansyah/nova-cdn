@@ -12,15 +12,16 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
+	"gorm.io/gorm"
 )
 
 type GalleryController struct {
-	repo    *repositories.GalleryRepository
-	genRepo *repositories.GenerateRepository
+	GalleryRepo  *repositories.GalleryRepository
+	GenerateRepo *repositories.GenerateRepository
 }
 
-func NewGalleryController(repo *repositories.GalleryRepository, genRepo *repositories.GenerateRepository) *GalleryController {
-	return &GalleryController{repo: repo, genRepo: genRepo}
+func NewGalleryController(db *gorm.DB) *GalleryController {
+	return &GalleryController{GalleryRepo: repositories.NewGalleryRepository(db), GenerateRepo: repositories.NewGenerateRepository(db)}
 }
 
 func toCamelCase(s string) string {
@@ -66,13 +67,13 @@ func (ctrl *GalleryController) Index(c *fiber.Ctx) error {
 		perPage = 10
 	}
 
-	total, err := ctrl.repo.Count(subject_id, subject_type, size)
+	total, err := ctrl.GalleryRepo.Count(subject_id, subject_type, size)
 
 	if err != nil {
 		return utils.ErrorResponse(c, fiber.StatusBadRequest, "Failed to count galleries")
 	}
 
-	galleries, err := ctrl.repo.FindAllPaginated(page, perPage, subject_id, subject_type, size)
+	galleries, err := ctrl.GalleryRepo.FindAllPaginated(page, perPage, subject_id, subject_type, size)
 
 	if err != nil {
 		return utils.ErrorResponse(c, fiber.StatusBadRequest, "Failed to retrieve galleries")
@@ -176,7 +177,7 @@ func (ctrl *GalleryController) Upload(c *fiber.Ctx) error {
 		}
 	}
 
-	groupCode := utils.GetCode(ctrl.genRepo, "gallery_group", true)
+	groupCode := utils.GetCode(ctrl.GenerateRepo, "gallery_group", true)
 
 	original := &models.Gallery{
 		UserID:       userID,
@@ -192,7 +193,7 @@ func (ctrl *GalleryController) Upload(c *fiber.Ctx) error {
 		GroupCode:    groupCode,
 	}
 
-	if err := ctrl.repo.Create(original); err != nil {
+	if err := ctrl.GalleryRepo.Create(original); err != nil {
 		return utils.ErrorResponse(c, fiber.StatusInternalServerError, "Failed to save original image")
 	}
 
@@ -223,7 +224,7 @@ func (ctrl *GalleryController) Upload(c *fiber.Ctx) error {
 			})
 		}
 
-		if err := ctrl.repo.CreateMany(processedGalleries); err != nil {
+		if err := ctrl.GalleryRepo.CreateMany(processedGalleries); err != nil {
 			return utils.ErrorResponse(c, fiber.StatusInternalServerError, "Failed to save processed images")
 		}
 
@@ -251,13 +252,13 @@ func (ctrl *GalleryController) Destroy(c *fiber.Ctx) error {
 		return utils.ErrorResponse(c, fiber.StatusBadRequest, "Invalid gallery ID")
 	}
 
-	gallery, err := ctrl.repo.FindByID(uint64(id), false)
+	gallery, err := ctrl.GalleryRepo.FindByID(uint64(id), false)
 
 	if err != nil {
 		return utils.ErrorResponse(c, fiber.StatusBadRequest, "Gallery not found")
 	}
 
-	if err := ctrl.repo.Delete(gallery); err != nil {
+	if err := ctrl.GalleryRepo.Delete(gallery); err != nil {
 		return utils.ErrorResponse(c, fiber.StatusInternalServerError, "Failed to delete gallery")
 	}
 
@@ -282,13 +283,13 @@ func (ctrl *GalleryController) ForceDelete(c *fiber.Ctx) error {
 		return utils.ErrorResponse(c, fiber.StatusBadRequest, "Invalid gallery ID")
 	}
 
-	gallery, err := ctrl.repo.FindByID(uint64(id), true)
+	gallery, err := ctrl.GalleryRepo.FindByID(uint64(id), true)
 
 	if err != nil {
 		return utils.ErrorResponse(c, fiber.StatusBadRequest, "Gallery not found")
 	}
 
-	if err := ctrl.repo.ForceDelete(gallery); err != nil {
+	if err := ctrl.GalleryRepo.ForceDelete(gallery); err != nil {
 		return utils.ErrorResponse(c, fiber.StatusInternalServerError, "Failed to delete gallery")
 	}
 
@@ -316,13 +317,13 @@ func (ctrl *GalleryController) Restore(c *fiber.Ctx) error {
 		return utils.ErrorResponse(c, fiber.StatusBadRequest, "Invalid gallery ID")
 	}
 
-	gallery, err := ctrl.repo.FindByID(uint64(id), true)
+	gallery, err := ctrl.GalleryRepo.FindByID(uint64(id), true)
 
 	if err != nil {
 		return utils.ErrorResponse(c, fiber.StatusBadRequest, "Gallery not found")
 	}
 
-	if err := ctrl.repo.Restore(gallery); err != nil {
+	if err := ctrl.GalleryRepo.Restore(gallery); err != nil {
 		return utils.ErrorResponse(c, fiber.StatusInternalServerError, "Failed to restore gallery")
 	}
 
@@ -348,7 +349,7 @@ func (ctrl *GalleryController) Show(c *fiber.Ctx) error {
 		return utils.ErrorResponse(c, fiber.StatusBadRequest, "Invalid gallery ID")
 	}
 
-	gallery, err := ctrl.repo.FindByID(uint64(id), false)
+	gallery, err := ctrl.GalleryRepo.FindByID(uint64(id), false)
 
 	if err != nil {
 		return utils.ErrorResponse(c, fiber.StatusBadRequest, "Gallery not found")
@@ -374,7 +375,7 @@ func (ctrl *GalleryController) ShowByGroupCode(c *fiber.Ctx) error {
 	groupCode := c.Params("group_code")
 	size := c.Query("size", "")
 
-	galleries, err := ctrl.repo.FindByGroupCode(groupCode, size)
+	galleries, err := ctrl.GalleryRepo.FindByGroupCode(groupCode, size)
 
 	if err != nil {
 		return utils.ErrorResponse(c, fiber.StatusBadRequest, "Gallery not found")
@@ -400,7 +401,7 @@ func (ctrl *GalleryController) DestroyByGroupCode(c *fiber.Ctx) error {
 	groupCode := c.Params("group_code")
 	size := c.Query("size", "")
 
-	if err := ctrl.repo.DeleteByGroupCode(groupCode, size); err != nil {
+	if err := ctrl.GalleryRepo.DeleteByGroupCode(groupCode, size); err != nil {
 		return utils.ErrorResponse(c, fiber.StatusInternalServerError, "Failed to delete galleries")
 	}
 
@@ -424,7 +425,7 @@ func (ctrl *GalleryController) ForceDeleteByGroupCode(c *fiber.Ctx) error {
 	groupCode := c.Params("group_code")
 	size := c.Query("size", "")
 
-	galleries, err := ctrl.repo.ForceDeleteByGroupCode(groupCode, size)
+	galleries, err := ctrl.GalleryRepo.ForceDeleteByGroupCode(groupCode, size)
 	if err != nil {
 		return utils.ErrorResponse(c, fiber.StatusInternalServerError, "Failed to delete galleries")
 	}

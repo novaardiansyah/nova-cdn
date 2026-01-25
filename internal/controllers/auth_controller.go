@@ -14,10 +14,11 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/thedevsaddam/govalidator"
 	"golang.org/x/crypto/bcrypt"
+	"gorm.io/gorm"
 )
 
 type AuthController struct {
-	userRepo repositories.UserRepository
+	UserRepo *repositories.UserRepository
 }
 
 type LoginRequest struct {
@@ -25,8 +26,8 @@ type LoginRequest struct {
 	Password string `json:"password" validate:"required,min=6"`
 }
 
-func NewAuthController(userRepo repositories.UserRepository) *AuthController {
-	return &AuthController{userRepo: userRepo}
+func NewAuthController(db *gorm.DB) *AuthController {
+	return &AuthController{UserRepo: repositories.NewUserRepository(db)}
 }
 
 type LoginResponse struct {
@@ -57,7 +58,7 @@ func (ctrl *AuthController) Login(c *fiber.Ctx) error {
 		return utils.ValidationError(c, errs)
 	}
 
-	user, err := ctrl.userRepo.FindByEmail(data["email"].(string))
+	user, err := ctrl.UserRepo.FindByEmail(data["email"].(string))
 	if err != nil {
 		return utils.ErrorResponse(c, fiber.StatusUnauthorized, "Invalid credentials")
 	}
