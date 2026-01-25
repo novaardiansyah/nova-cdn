@@ -1,3 +1,15 @@
+/*
+ * Project Name: controllers
+ * File: gallery_controller.go
+ * Created Date: Monday December 29th 2025
+ *
+ * Author: Nova Ardiansyah admin@novaardiansyah.id
+ * Website: https://novaardiansyah.id
+ * MIT License: https://github.com/novaardiansyah/nova-cdn/blob/main/LICENSE
+ *
+ * Copyright (c) 2026 Nova Ardiansyah, Org
+ */
+
 package controllers
 
 import (
@@ -5,7 +17,6 @@ import (
 	"nova-cdn/internal/service"
 	"nova-cdn/pkg/utils"
 	"strconv"
-	"strings"
 
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
@@ -23,19 +34,6 @@ func NewGalleryController(db *gorm.DB) *GalleryController {
 		GenerateRepo:   repositories.NewGenerateRepository(db),
 		GalleryService: service.NewGalleryService(db),
 	}
-}
-
-func toCamelCase(s string) string {
-	if s == "" {
-		return ""
-	}
-	words := strings.Split(s, "_")
-	for i, word := range words {
-		if len(word) > 0 {
-			words[i] = strings.ToUpper(word[:1]) + word[1:]
-		}
-	}
-	return strings.Join(words, "")
 }
 
 // Index godoc

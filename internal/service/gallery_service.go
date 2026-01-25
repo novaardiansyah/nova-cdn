@@ -1,3 +1,15 @@
+/*
+ * Project Name: service
+ * File: gallery_service.go
+ * Created Date: Sunday January 25th 2026
+ *
+ * Author: Nova Ardiansyah admin@novaardiansyah.id
+ * Website: https://novaardiansyah.id
+ * MIT License: https://github.com/novaardiansyah/nova-cdn/blob/main/LICENSE
+ *
+ * Copyright (c) 2026 Nova Ardiansyah, Org
+ */
+
 package service
 
 import (
