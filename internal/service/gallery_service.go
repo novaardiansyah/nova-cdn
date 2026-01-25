@@ -2,6 +2,8 @@ package service
 
 import (
 	"fmt"
+	"mime/multipart"
+	"nova-cdn/internal/dto"
 	"nova-cdn/internal/models"
 	"nova-cdn/internal/repositories"
 	"nova-cdn/pkg/utils"
@@ -32,87 +34,46 @@ func NewGalleryService(db *gorm.DB) GalleryService {
 
 func (s *galleryService) Upload(c *fiber.Ctx) error {
 	file, err := c.FormFile("file")
+
 	if err != nil {
 		return utils.ErrorResponse(c, fiber.StatusBadRequest, "No file uploaded")
 	}
 
-	allowedTypes := map[string]bool{
-		"image/jpeg": true,
-		"image/png":  true,
-		"image/gif":  true,
-		"image/webp": true,
+	if err := s.validateFile(file); err != nil {
+		return utils.ErrorResponse(c, fiber.StatusBadRequest, err.Error())
 	}
 
-	contentType := file.Header.Get("Content-Type")
-	if !allowedTypes[contentType] {
-		return utils.ErrorResponse(c, fiber.StatusBadRequest, "Invalid file type. Only JPEG, PNG, GIF, and WebP are allowed")
+	input, err := s.parseUploadInput(c)
+	if err != nil {
+		return utils.ErrorResponse(c, fiber.StatusBadRequest, err.Error())
 	}
 
-	maxSize := int64(10 * 1024 * 1024)
-	if file.Size > maxSize {
-		return utils.ErrorResponse(c, fiber.StatusBadRequest, "File size exceeds 10MB limit")
+	filePath, newFileName, err := s.saveFileToDisk(c, file, input.Dir)
+	if err != nil {
+		return utils.ErrorResponse(c, fiber.StatusInternalServerError, err.Error())
 	}
 
-	dir := c.FormValue("dir", "gallery")
-
-	ext := filepath.Ext(file.Filename)
-	newUid, err := uuid.NewV7()
-
-	newFileName := fmt.Sprintf("%v%s", newUid.String(), ext)
-	filePath := fmt.Sprintf("images/%s/%s", dir, newFileName)
-	fullPath := "public/" + filePath
-	outputDir := fmt.Sprintf("public/images/%s", dir)
-
-	if err := os.MkdirAll(outputDir, 0755); err != nil {
-		return utils.ErrorResponse(c, fiber.StatusInternalServerError, "Failed to create directory")
-	}
-
-	if err := c.SaveFile(file, fullPath); err != nil {
-		return utils.ErrorResponse(c, fiber.StatusInternalServerError, "Failed to save file")
-	}
-
-	description := c.FormValue("description", "")
-	isPrivate := c.FormValue("is_private", "false") == "true"
-	userID := c.Locals("user_id").(uint)
-
-	subjectIDStr := c.FormValue("subject_id", "")
-	subjectTypeStr := c.FormValue("subject_type", "")
-
-	var subjectID *uint
-	var subjectType *string
-
-	if subjectIDStr != "" {
-		if sid, err := strconv.ParseUint(subjectIDStr, 10, 32); err == nil {
-			usid := uint(sid)
-			subjectID = &usid
-
-			if subjectTypeStr != "" {
-				subjectType = &subjectTypeStr
-			} else {
-				stype := "App\\Models\\" + utils.ToCamelCase(dir)
-				subjectType = &stype
-			}
-		}
-	}
+	fullPath := filepath.Join(dto.UploadDirBase, filePath)
+	outputDir := filepath.Join(dto.UploadDirBase, "images", input.Dir)
 
 	groupCode := utils.GetCode(s.GenerateRepo, "gallery_group", true)
 
-	original := &models.Gallery{
-		UserID:       userID,
-		SubjectID:    subjectID,
-		SubjectType:  subjectType,
+	original := models.Gallery{
+		UserID:       input.UserID,
+		SubjectID:    input.SubjectID,
+		SubjectType:  input.SubjectType,
 		FileName:     newFileName,
 		FilePath:     filePath,
 		FileSize:     uint32(file.Size),
-		Description:  description,
-		IsPrivate:    isPrivate,
+		Description:  input.Description,
+		IsPrivate:    input.IsPrivate,
 		Size:         "original",
 		HasOptimized: true,
 		GroupCode:    groupCode,
 	}
 
-	if err := s.GalleryRepo.Create(original); err != nil {
-		return utils.ErrorResponse(c, fiber.StatusInternalServerError, "Failed to save original image")
+	if err := s.GalleryRepo.Create(&original); err != nil {
+		return utils.ErrorResponse(c, fiber.StatusInternalServerError, "Failed to save original image metadata")
 	}
 
 	processedImages, err := utils.ProcessImage(fullPath, outputDir, newFileName)
@@ -120,34 +81,107 @@ func (s *galleryService) Upload(c *fiber.Ctx) error {
 		return utils.ErrorResponse(c, fiber.StatusInternalServerError, "Failed to process image: "+err.Error())
 	}
 
-	var galleries []*models.Gallery
-	galleries = append(galleries, original)
-
 	if len(processedImages) > 0 {
-		var processedGalleries []*models.Gallery
-
-		for _, img := range processedImages {
-			processedGalleries = append(processedGalleries, &models.Gallery{
-				UserID:       userID,
-				SubjectID:    subjectID,
-				SubjectType:  subjectType,
-				FileName:     img.FileName,
-				FilePath:     fmt.Sprintf("images/%s/%s", dir, img.FileName),
-				FileSize:     img.FileSize,
-				Description:  description,
-				IsPrivate:    isPrivate,
-				HasOptimized: false,
-				Size:         img.Size,
-				GroupCode:    groupCode,
-			})
-		}
+		processedGalleries := s.buildProcessedGalleries(input, processedImages, filePath, groupCode)
 
 		if err := s.GalleryRepo.CreateMany(processedGalleries); err != nil {
-			return utils.ErrorResponse(c, fiber.StatusInternalServerError, "Failed to save processed images")
+			return utils.ErrorResponse(c, fiber.StatusInternalServerError, "Failed to save processed images metadata")
 		}
+	}
 
-		galleries = append(galleries, processedGalleries...)
+	galleries, err := s.GalleryRepo.FindByGroupCode(groupCode, "")
+	if err != nil {
+		return utils.ErrorResponse(c, fiber.StatusInternalServerError, "Failed to get processed images metadata")
 	}
 
 	return utils.CreatedResponse(c, "Image uploaded successfully", galleries)
+}
+
+func (s *galleryService) validateFile(file *multipart.FileHeader) error {
+	contentType := file.Header.Get("Content-Type")
+	if !dto.AllowedMimeTypes[contentType] {
+		return fmt.Errorf("invalid file type. Only JPEG, PNG, GIF, and WebP are allowed")
+	}
+	if file.Size > dto.MaxUploadSize {
+		return fmt.Errorf("file size exceeds 10MB limit")
+	}
+	return nil
+}
+
+func (s *galleryService) parseUploadInput(c *fiber.Ctx) (*dto.UploadInput, error) {
+	userID := c.Locals("user_id").(uint)
+
+	input := &dto.UploadInput{
+		Dir:         c.FormValue("dir", dto.DefaultImageDir),
+		Description: c.FormValue("description", ""),
+		IsPrivate:   c.FormValue("is_private", "false") == "true",
+		UserID:      userID,
+	}
+
+	subjectIDStr := c.FormValue("subject_id", "")
+	subjectTypeStr := c.FormValue("subject_type", "")
+
+	if subjectIDStr != "" {
+		sid, err := strconv.ParseUint(subjectIDStr, 10, 32)
+		if err != nil {
+			return nil, fmt.Errorf("invalid subject_id format")
+		}
+		usid := uint(sid)
+		input.SubjectID = &usid
+
+		if subjectTypeStr != "" {
+			input.SubjectType = &subjectTypeStr
+		} else {
+			stype := dto.ModelPrefix + utils.ToCamelCase(input.Dir)
+			input.SubjectType = &stype
+		}
+	}
+
+	return input, nil
+}
+
+func (s *galleryService) saveFileToDisk(c *fiber.Ctx, file *multipart.FileHeader, dir string) (string, string, error) {
+	ext := filepath.Ext(file.Filename)
+	newUid, err := uuid.NewV7()
+
+	if err != nil {
+		return "", "", err
+	}
+
+	newFileName := fmt.Sprintf("%v%s", newUid.String(), ext)
+	relativePath := fmt.Sprintf("images/%s/%s", dir, newFileName)
+	fullPath := filepath.Join(dto.UploadDirBase, relativePath)
+	outputDir := filepath.Join(dto.UploadDirBase, "images", dir)
+
+	if err := os.MkdirAll(outputDir, 0755); err != nil {
+		return "", "", fmt.Errorf("failed to create directory: %w", err)
+	}
+
+	if err := c.SaveFile(file, fullPath); err != nil {
+		return "", "", fmt.Errorf("failed to save file: %w", err)
+	}
+
+	return relativePath, newFileName, nil
+}
+
+func (s *galleryService) buildProcessedGalleries(input *dto.UploadInput, processedImages []utils.ProcessedImage, originalPath string, groupCode string) []*models.Gallery {
+	var result []*models.Gallery
+	dirPath := filepath.Dir(originalPath)
+
+	for _, img := range processedImages {
+		result = append(result, &models.Gallery{
+			UserID:       input.UserID,
+			SubjectID:    input.SubjectID,
+			SubjectType:  input.SubjectType,
+			FileName:     img.FileName,
+			FilePath:     fmt.Sprintf("%s/%s", dirPath, img.FileName),
+			FileSize:     img.FileSize,
+			Description:  input.Description,
+			IsPrivate:    input.IsPrivate,
+			HasOptimized: false,
+			Size:         img.Size,
+			GroupCode:    groupCode,
+		})
+	}
+	return result
 }
