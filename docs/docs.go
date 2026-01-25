@@ -206,7 +206,7 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "default": "gallery",
-                        "description": "Directory name (gallery, payment, item)",
+                        "description": "Directory name (gallery, payment, item, etc.)",
                         "name": "dir",
                         "in": "formData"
                     },

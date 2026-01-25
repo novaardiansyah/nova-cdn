@@ -465,7 +465,7 @@ paths:
         name: subject_type
         type: string
       - default: gallery
-        description: Directory name (gallery, payment, item)
+        description: Directory name (gallery, payment, item, etc.)
         in: formData
         name: dir
         type: string
