@@ -3,15 +3,18 @@ package middleware
 import (
 	"crypto/sha256"
 	"encoding/hex"
-	"nova-cdn/internal/config"
-	"nova-cdn/internal/models"
+	"nova-cdn/internal/repositories"
+	"strconv"
 	"strings"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
+	"gorm.io/gorm"
 )
 
-func Auth() fiber.Handler {
+func Auth(db *gorm.DB) fiber.Handler {
+	PersonalAccessTokenRepo := repositories.NewPersonalAccessTokenRepository(db)
+
 	return func(c *fiber.Ctx) error {
 		authHeader := c.Get("Authorization")
 
@@ -38,17 +41,24 @@ func Auth() fiber.Handler {
 			})
 		}
 
-		tokenID := parts[0]
+		tokenIDStr := parts[0]
 		plainTextToken := parts[1]
+
+		tokenID, err := strconv.ParseUint(tokenIDStr, 10, 64)
+
+		if err != nil {
+			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+				"success": false,
+				"message": "Unauthorized: Invalid token format",
+			})
+		}
 
 		hash := sha256.Sum256([]byte(plainTextToken))
 		hashedToken := hex.EncodeToString(hash[:])
 
-		db := config.GetDB()
-		var token models.PersonalAccessToken
+		token, err := PersonalAccessTokenRepo.FindByIDAndHashedToken(tokenID, hashedToken)
 
-		result := db.Where("id = ? AND token = ?", tokenID, hashedToken).First(&token)
-		if result.Error != nil {
+		if err != nil {
 			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
 				"success": false,
 				"message": "Unauthorized: Invalid token",
@@ -62,10 +72,13 @@ func Auth() fiber.Handler {
 			})
 		}
 
-		db.Model(&token).Update("last_used_at", time.Now())
+		fields := map[string]interface{}{"last_used_at": time.Now()}
+		PersonalAccessTokenRepo.UpdateFields(token, fields)
 
-		c.Locals("token", token)
-		c.Locals("user_id", token.TokenableID)
+		UserId := token.TokenableID
+
+		c.Locals("token", *token)
+		c.Locals("user_id", UserId)
 
 		return c.Next()
 	}

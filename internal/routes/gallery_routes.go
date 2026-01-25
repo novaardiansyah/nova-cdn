@@ -11,7 +11,7 @@ import (
 func GalleryRoutes(api fiber.Router, db *gorm.DB) {
 	galleryController := controllers.NewGalleryController(db)
 
-	galleries := api.Group("/galleries", middleware.Auth())
+	galleries := api.Group("/galleries", middleware.Auth(db))
 
 	galleries.Get("/", galleryController.Index)
 	galleries.Post("/upload", galleryController.Upload)
