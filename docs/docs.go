@@ -70,7 +70,7 @@ const docTemplate = `{
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/nova-cdn_pkg_utils.ErrorSimpleResponse"
+                            "$ref": "#/definitions/nova-cdn_pkg_utils.SimpleErrorResponse"
                         }
                     },
                     "422": {
@@ -159,7 +159,7 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/nova-cdn_pkg_utils.ErrorSimpleResponse"
+                            "$ref": "#/definitions/nova-cdn_pkg_utils.SimpleErrorResponse"
                         }
                     }
                 }
@@ -249,13 +249,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/nova-cdn_pkg_utils.ErrorSimpleResponse"
+                            "$ref": "#/definitions/nova-cdn_pkg_utils.SimpleErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/nova-cdn_pkg_utils.ErrorSimpleResponse"
+                            "$ref": "#/definitions/nova-cdn_pkg_utils.SimpleErrorResponse"
                         }
                     }
                 }
@@ -316,13 +316,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/nova-cdn_pkg_utils.ErrorSimpleResponse"
+                            "$ref": "#/definitions/nova-cdn_pkg_utils.SimpleErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/nova-cdn_pkg_utils.ErrorSimpleResponse"
+                            "$ref": "#/definitions/nova-cdn_pkg_utils.SimpleErrorResponse"
                         }
                     }
                 }
@@ -369,13 +369,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/nova-cdn_pkg_utils.ErrorSimpleResponse"
+                            "$ref": "#/definitions/nova-cdn_pkg_utils.SimpleErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/nova-cdn_pkg_utils.ErrorSimpleResponse"
+                            "$ref": "#/definitions/nova-cdn_pkg_utils.SimpleErrorResponse"
                         }
                     }
                 }
@@ -424,13 +424,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/nova-cdn_pkg_utils.ErrorSimpleResponse"
+                            "$ref": "#/definitions/nova-cdn_pkg_utils.SimpleErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/nova-cdn_pkg_utils.ErrorSimpleResponse"
+                            "$ref": "#/definitions/nova-cdn_pkg_utils.SimpleErrorResponse"
                         }
                     }
                 }
@@ -485,13 +485,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/nova-cdn_pkg_utils.ErrorSimpleResponse"
+                            "$ref": "#/definitions/nova-cdn_pkg_utils.SimpleErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/nova-cdn_pkg_utils.ErrorSimpleResponse"
+                            "$ref": "#/definitions/nova-cdn_pkg_utils.SimpleErrorResponse"
                         }
                     }
                 }
@@ -532,13 +532,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/nova-cdn_pkg_utils.ErrorSimpleResponse"
+                            "$ref": "#/definitions/nova-cdn_pkg_utils.SimpleErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/nova-cdn_pkg_utils.ErrorSimpleResponse"
+                            "$ref": "#/definitions/nova-cdn_pkg_utils.SimpleErrorResponse"
                         }
                     }
                 }
@@ -581,13 +581,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/nova-cdn_pkg_utils.ErrorSimpleResponse"
+                            "$ref": "#/definitions/nova-cdn_pkg_utils.SimpleErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/nova-cdn_pkg_utils.ErrorSimpleResponse"
+                            "$ref": "#/definitions/nova-cdn_pkg_utils.SimpleErrorResponse"
                         }
                     }
                 }
@@ -642,13 +642,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/nova-cdn_pkg_utils.ErrorSimpleResponse"
+                            "$ref": "#/definitions/nova-cdn_pkg_utils.SimpleErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/nova-cdn_pkg_utils.ErrorSimpleResponse"
+                            "$ref": "#/definitions/nova-cdn_pkg_utils.SimpleErrorResponse"
                         }
                     }
                 }
@@ -715,18 +715,6 @@ const docTemplate = `{
                 }
             }
         },
-        "nova-cdn_pkg_utils.ErrorSimpleResponse": {
-            "type": "object",
-            "properties": {
-                "message": {
-                    "type": "string"
-                },
-                "success": {
-                    "type": "boolean",
-                    "example": false
-                }
-            }
-        },
         "nova-cdn_pkg_utils.Meta": {
             "type": "object",
             "properties": {
@@ -761,7 +749,8 @@ const docTemplate = `{
                     "$ref": "#/definitions/nova-cdn_pkg_utils.Meta"
                 },
                 "success": {
-                    "type": "boolean"
+                    "type": "boolean",
+                    "default": true
                 }
             }
         },
@@ -777,6 +766,18 @@ const docTemplate = `{
                 }
             }
         },
+        "nova-cdn_pkg_utils.SimpleErrorResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                },
+                "success": {
+                    "type": "boolean",
+                    "default": false
+                }
+            }
+        },
         "nova-cdn_pkg_utils.SimpleResponse": {
             "type": "object",
             "properties": {
@@ -785,7 +786,7 @@ const docTemplate = `{
                 },
                 "success": {
                     "type": "boolean",
-                    "example": true
+                    "default": true
                 }
             }
         },
@@ -802,12 +803,11 @@ const docTemplate = `{
                     }
                 },
                 "message": {
-                    "type": "string",
-                    "example": "Validation error"
+                    "type": "string"
                 },
                 "success": {
                     "type": "boolean",
-                    "example": false
+                    "default": false
                 }
             }
         }

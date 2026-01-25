@@ -48,7 +48,7 @@ func toCamelCase(s string) string {
 // @Param subject_type query string false "Subject Type"
 // @Param size query string false "Size (original, small, medium, large)"
 // @Success 200 {object} utils.PaginatedResponse{data=[]GallerySwagger}
-// @Failure 400 {object} utils.ErrorSimpleResponse
+// @Failure 400 {object} utils.SimpleErrorResponse
 // @Router /galleries [get]
 // @Security BearerAuth
 func (ctrl *GalleryController) Index(c *fiber.Ctx) error {
@@ -98,8 +98,8 @@ func (ctrl *GalleryController) Index(c *fiber.Ctx) error {
 // @Param description formData string false "Image description"
 // @Param is_private formData boolean false "Set image as private" default(false)
 // @Success 201 {object} utils.Response{data=[]GallerySwagger}
-// @Failure 400 {object} utils.ErrorSimpleResponse
-// @Failure 500 {object} utils.ErrorSimpleResponse
+// @Failure 400 {object} utils.SimpleErrorResponse
+// @Failure 500 {object} utils.SimpleErrorResponse
 // @Router /galleries/upload [post]
 // @Security BearerAuth
 func (ctrl *GalleryController) Upload(c *fiber.Ctx) error {
@@ -241,8 +241,8 @@ func (ctrl *GalleryController) Upload(c *fiber.Ctx) error {
 // @Produce json
 // @Param id path int true "Gallery ID"
 // @Success 200 {object} utils.SimpleResponse
-// @Failure 400 {object} utils.ErrorSimpleResponse
-// @Failure 500 {object} utils.ErrorSimpleResponse
+// @Failure 400 {object} utils.SimpleErrorResponse
+// @Failure 500 {object} utils.SimpleErrorResponse
 // @Router /galleries/{id} [delete]
 // @Security BearerAuth
 func (ctrl *GalleryController) Destroy(c *fiber.Ctx) error {
@@ -272,8 +272,8 @@ func (ctrl *GalleryController) Destroy(c *fiber.Ctx) error {
 // @Produce json
 // @Param id path int true "Gallery ID"
 // @Success 200 {object} utils.SimpleResponse
-// @Failure 400 {object} utils.ErrorSimpleResponse
-// @Failure 500 {object} utils.ErrorSimpleResponse
+// @Failure 400 {object} utils.SimpleErrorResponse
+// @Failure 500 {object} utils.SimpleErrorResponse
 // @Router /galleries/{id}/force [delete]
 // @Security BearerAuth
 func (ctrl *GalleryController) ForceDelete(c *fiber.Ctx) error {
@@ -305,8 +305,8 @@ func (ctrl *GalleryController) ForceDelete(c *fiber.Ctx) error {
 // @Produce json
 // @Param id path int true "Gallery ID"
 // @Success 200 {object} utils.Response{data=GallerySwagger}
-// @Failure 400 {object} utils.ErrorSimpleResponse
-// @Failure 500 {object} utils.ErrorSimpleResponse
+// @Failure 400 {object} utils.SimpleErrorResponse
+// @Failure 500 {object} utils.SimpleErrorResponse
 // @Router /galleries/{id}/restore [post]
 // @Security BearerAuth
 func (ctrl *GalleryController) Restore(c *fiber.Ctx) error {
@@ -337,8 +337,8 @@ func (ctrl *GalleryController) Restore(c *fiber.Ctx) error {
 // @Produce json
 // @Param id path int true "Gallery ID"
 // @Success 200 {object} utils.Response{data=GallerySwagger}
-// @Failure 400 {object} utils.ErrorSimpleResponse
-// @Failure 500 {object} utils.ErrorSimpleResponse
+// @Failure 400 {object} utils.SimpleErrorResponse
+// @Failure 500 {object} utils.SimpleErrorResponse
 // @Router /galleries/{id} [get]
 // @Security BearerAuth
 func (ctrl *GalleryController) Show(c *fiber.Ctx) error {
@@ -366,8 +366,8 @@ func (ctrl *GalleryController) Show(c *fiber.Ctx) error {
 // @Param group_code path string true "Group Code"
 // @Param size query string false "Size (original, small, medium, large)"
 // @Success 200 {object} utils.Response{data=GallerySwagger}
-// @Failure 400 {object} utils.ErrorSimpleResponse
-// @Failure 500 {object} utils.ErrorSimpleResponse
+// @Failure 400 {object} utils.SimpleErrorResponse
+// @Failure 500 {object} utils.SimpleErrorResponse
 // @Router /galleries/{group_code} [get]
 // @Security BearerAuth
 func (ctrl *GalleryController) ShowByGroupCode(c *fiber.Ctx) error {
@@ -392,8 +392,8 @@ func (ctrl *GalleryController) ShowByGroupCode(c *fiber.Ctx) error {
 // @Param group_code path string true "Group Code"
 // @Param size query string false "Size (original, small, medium, large)"
 // @Success 200 {object} utils.SimpleResponse
-// @Failure 400 {object} utils.ErrorSimpleResponse
-// @Failure 500 {object} utils.ErrorSimpleResponse
+// @Failure 400 {object} utils.SimpleErrorResponse
+// @Failure 500 {object} utils.SimpleErrorResponse
 // @Router /galleries/{group_code} [delete]
 // @Security BearerAuth
 func (ctrl *GalleryController) DestroyByGroupCode(c *fiber.Ctx) error {
@@ -416,8 +416,8 @@ func (ctrl *GalleryController) DestroyByGroupCode(c *fiber.Ctx) error {
 // @Param group_code path string true "Group Code"
 // @Param size query string false "Size (original, small, medium, large)"
 // @Success 200 {object} utils.SimpleResponse
-// @Failure 400 {object} utils.ErrorSimpleResponse
-// @Failure 500 {object} utils.ErrorSimpleResponse
+// @Failure 400 {object} utils.SimpleErrorResponse
+// @Failure 500 {object} utils.SimpleErrorResponse
 // @Router /galleries/{group_code}/force [delete]
 // @Security BearerAuth
 func (ctrl *GalleryController) ForceDeleteByGroupCode(c *fiber.Ctx) error {

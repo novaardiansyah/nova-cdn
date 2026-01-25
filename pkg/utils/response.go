@@ -4,30 +4,35 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-type SimpleResponse struct {
-	Success bool   `json:"success" example:"true"`
-	Message string `json:"message"`
-}
-
-type ErrorSimpleResponse struct {
-	Success bool   `json:"success" example:"false"`
-	Message string `json:"message"`
-}
-
 type Response struct {
 	Success bool        `json:"success"`
 	Message string      `json:"message"`
 	Data    interface{} `json:"data,omitempty"`
 }
 
+type SimpleResponse struct {
+	Success bool `json:"success" default:"true"`
+	Message string `json:"message"`
+}
+
 type ValidationErrorResponse struct {
-	Success bool                `json:"success" example:"false"`
-	Message string              `json:"message" example:"Validation error"`
+	Success bool                `json:"success" default:"false"`
+	Message string              `json:"message"`
 	Errors  map[string][]string `json:"errors"`
 }
 
+type SimpleErrorResponse struct {
+	Success bool   `json:"success" default:"false"`
+	Message string `json:"message"`
+}
+
+type UnauthorizedResponse struct {
+	Success bool   `json:"success" default:"false"`
+	Message string `json:"message" default:"Unauthorized: reason..."`
+}
+
 type PaginatedResponse struct {
-	Success bool        `json:"success"`
+	Success bool        `json:"success" default:"true"`
 	Message string      `json:"message"`
 	Data    interface{} `json:"data"`
 	Meta    Meta        `json:"meta"`
@@ -66,7 +71,7 @@ func CreatedResponse(c *fiber.Ctx, message string, data interface{}) error {
 }
 
 func ErrorResponse(c *fiber.Ctx, statusCode int, message string) error {
-	return c.Status(statusCode).JSON(SimpleResponse{
+	return c.Status(statusCode).JSON(SimpleErrorResponse{
 		Success: false,
 		Message: message,
 	})
