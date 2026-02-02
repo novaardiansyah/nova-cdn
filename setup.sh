@@ -22,11 +22,11 @@ echo "--> Setting writable permissions..."
 sudo chmod 755 runner-app
 
 echo "--> Supervisor setup..."
-sudo cp ./deploy/supervisor.conf /etc/supervisor/conf.d/nova-cdn_novadev_myid.conf
+sudo cp ./deploy/supervisor.conf /etc/supervisor/conf.d/cdn_novaardiansyah_id.conf
 
 sudo supervisorctl reread
 sudo supervisorctl update
-sudo supervisorctl restart nova-cdn_novadev_myid
+sudo supervisorctl restart cdn_novaardiansyah_id
 
 echo "--> Securing credentials files..."
 sudo chmod 600 .env .env.local .env.production .well-known .git artisan Makefile setup.sh 2>/dev/null
