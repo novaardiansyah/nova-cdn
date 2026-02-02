@@ -197,3 +197,5 @@ func (s *galleryService) buildProcessedGalleries(input *dto.UploadInput, process
 	}
 	return result
 }
+
+// ! End Upload()

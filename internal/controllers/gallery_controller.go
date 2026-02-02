@@ -13,6 +13,7 @@
 package controllers
 
 import (
+	"fmt"
 	"nova-cdn/internal/repositories"
 	"nova-cdn/internal/service"
 	"nova-cdn/pkg/utils"
@@ -177,9 +178,10 @@ func (ctrl *GalleryController) ForceDelete(c *fiber.Ctx) error {
 // @Accept json
 // @Produce json
 // @Param id path int true "Gallery ID"
-// @Success 200 {object} utils.Response{data=GallerySwagger}
+// @Success 200 {object} utils.SimpleResponse
+// @Failure 401 {object} utils.SimpleErrorResponse
 // @Failure 400 {object} utils.SimpleErrorResponse
-// @Failure 500 {object} utils.SimpleErrorResponse
+// @Failure 404 {object} utils.SimpleErrorResponse
 // @Router /galleries/{id}/restore [post]
 // @Security BearerAuth
 func (ctrl *GalleryController) Restore(c *fiber.Ctx) error {
@@ -199,7 +201,31 @@ func (ctrl *GalleryController) Restore(c *fiber.Ctx) error {
 		return utils.ErrorResponse(c, fiber.StatusInternalServerError, "Failed to restore gallery")
 	}
 
-	return utils.SuccessResponse(c, "Gallery restored successfully", gallery)
+	return utils.SimpleSuccessResponse(c, "Gallery restored successfully")
+}
+
+// RestoreByGroupCode godoc
+// @Summary Restore a gallery item by group code
+// @Description Restore a gallery item from the trash by group code
+// @Tags galleries
+// @Accept json
+// @Produce json
+// @Param group_code path string true "Group code"
+// @Success 200 {object} utils.SimpleResponse
+// @Failure 401 {object} utils.SimpleErrorResponse
+// @Failure 400 {object} utils.SimpleErrorResponse
+// @Failure 404 {object} utils.SimpleErrorResponse
+// @Router /galleries/{group_code}/restore [post]
+// @Security BearerAuth
+func (ctrl *GalleryController) RestoreByGroupCode(c *fiber.Ctx) error {
+	groupCode := c.Params("group_code")
+
+	if err := ctrl.GalleryRepo.RestoreByGroupCode(groupCode, ""); err != nil {
+		fmt.Println(err)
+		return utils.ErrorResponse(c, fiber.StatusInternalServerError, "Failed to restore gallery")
+	}
+
+	return utils.SimpleSuccessResponse(c, "Gallery restored successfully")
 }
 
 // Show godoc

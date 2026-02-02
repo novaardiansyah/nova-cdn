@@ -44,7 +44,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/internal_controllers.LoginRequest"
+                            "$ref": "#/definitions/controllers.LoginRequest"
                         }
                     }
                 ],
@@ -54,13 +54,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/nova-cdn_pkg_utils.Response"
+                                    "$ref": "#/definitions/utils.Response"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/internal_controllers.LoginResponse"
+                                            "$ref": "#/definitions/controllers.LoginResponse"
                                         }
                                     }
                                 }
@@ -70,13 +70,13 @@ const docTemplate = `{
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/nova-cdn_pkg_utils.SimpleErrorResponse"
+                            "$ref": "#/definitions/utils.SimpleErrorResponse"
                         }
                     },
                     "422": {
                         "description": "Unprocessable Entity",
                         "schema": {
-                            "$ref": "#/definitions/nova-cdn_pkg_utils.ValidationErrorResponse"
+                            "$ref": "#/definitions/utils.ValidationErrorResponse"
                         }
                     }
                 }
@@ -140,7 +140,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/nova-cdn_pkg_utils.PaginatedResponse"
+                                    "$ref": "#/definitions/utils.PaginatedResponse"
                                 },
                                 {
                                     "type": "object",
@@ -148,7 +148,7 @@ const docTemplate = `{
                                         "data": {
                                             "type": "array",
                                             "items": {
-                                                "$ref": "#/definitions/internal_controllers.GallerySwagger"
+                                                "$ref": "#/definitions/controllers.GallerySwagger"
                                             }
                                         }
                                     }
@@ -159,7 +159,7 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/nova-cdn_pkg_utils.SimpleErrorResponse"
+                            "$ref": "#/definitions/utils.SimpleErrorResponse"
                         }
                     }
                 }
@@ -230,7 +230,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/nova-cdn_pkg_utils.Response"
+                                    "$ref": "#/definitions/utils.Response"
                                 },
                                 {
                                     "type": "object",
@@ -238,7 +238,7 @@ const docTemplate = `{
                                         "data": {
                                             "type": "array",
                                             "items": {
-                                                "$ref": "#/definitions/internal_controllers.GallerySwagger"
+                                                "$ref": "#/definitions/controllers.GallerySwagger"
                                             }
                                         }
                                     }
@@ -249,13 +249,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/nova-cdn_pkg_utils.SimpleErrorResponse"
+                            "$ref": "#/definitions/utils.SimpleErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/nova-cdn_pkg_utils.SimpleErrorResponse"
+                            "$ref": "#/definitions/utils.SimpleErrorResponse"
                         }
                     }
                 }
@@ -300,13 +300,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/nova-cdn_pkg_utils.Response"
+                                    "$ref": "#/definitions/utils.Response"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/internal_controllers.GallerySwagger"
+                                            "$ref": "#/definitions/controllers.GallerySwagger"
                                         }
                                     }
                                 }
@@ -316,13 +316,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/nova-cdn_pkg_utils.SimpleErrorResponse"
+                            "$ref": "#/definitions/utils.SimpleErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/nova-cdn_pkg_utils.SimpleErrorResponse"
+                            "$ref": "#/definitions/utils.SimpleErrorResponse"
                         }
                     }
                 }
@@ -363,19 +363,19 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/nova-cdn_pkg_utils.SimpleResponse"
+                            "$ref": "#/definitions/utils.SimpleResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/nova-cdn_pkg_utils.SimpleErrorResponse"
+                            "$ref": "#/definitions/utils.SimpleErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/nova-cdn_pkg_utils.SimpleErrorResponse"
+                            "$ref": "#/definitions/utils.SimpleErrorResponse"
                         }
                     }
                 }
@@ -418,19 +418,74 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/nova-cdn_pkg_utils.SimpleResponse"
+                            "$ref": "#/definitions/utils.SimpleResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/nova-cdn_pkg_utils.SimpleErrorResponse"
+                            "$ref": "#/definitions/utils.SimpleErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/nova-cdn_pkg_utils.SimpleErrorResponse"
+                            "$ref": "#/definitions/utils.SimpleErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/galleries/{group_code}/restore": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Restore a gallery item from the trash by group code",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "galleries"
+                ],
+                "summary": "Restore a gallery item by group code",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Group code",
+                        "name": "group_code",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/utils.SimpleResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.SimpleErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/utils.SimpleErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/utils.SimpleErrorResponse"
                         }
                     }
                 }
@@ -469,13 +524,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/nova-cdn_pkg_utils.Response"
+                                    "$ref": "#/definitions/utils.Response"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/internal_controllers.GallerySwagger"
+                                            "$ref": "#/definitions/controllers.GallerySwagger"
                                         }
                                     }
                                 }
@@ -485,13 +540,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/nova-cdn_pkg_utils.SimpleErrorResponse"
+                            "$ref": "#/definitions/utils.SimpleErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/nova-cdn_pkg_utils.SimpleErrorResponse"
+                            "$ref": "#/definitions/utils.SimpleErrorResponse"
                         }
                     }
                 }
@@ -526,19 +581,19 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/nova-cdn_pkg_utils.SimpleResponse"
+                            "$ref": "#/definitions/utils.SimpleResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/nova-cdn_pkg_utils.SimpleErrorResponse"
+                            "$ref": "#/definitions/utils.SimpleErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/nova-cdn_pkg_utils.SimpleErrorResponse"
+                            "$ref": "#/definitions/utils.SimpleErrorResponse"
                         }
                     }
                 }
@@ -575,19 +630,19 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/nova-cdn_pkg_utils.SimpleResponse"
+                            "$ref": "#/definitions/utils.SimpleResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/nova-cdn_pkg_utils.SimpleErrorResponse"
+                            "$ref": "#/definitions/utils.SimpleErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/nova-cdn_pkg_utils.SimpleErrorResponse"
+                            "$ref": "#/definitions/utils.SimpleErrorResponse"
                         }
                     }
                 }
@@ -624,31 +679,25 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/nova-cdn_pkg_utils.Response"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/definitions/internal_controllers.GallerySwagger"
-                                        }
-                                    }
-                                }
-                            ]
+                            "$ref": "#/definitions/utils.SimpleResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/nova-cdn_pkg_utils.SimpleErrorResponse"
+                            "$ref": "#/definitions/utils.SimpleErrorResponse"
                         }
                     },
-                    "500": {
-                        "description": "Internal Server Error",
+                    "401": {
+                        "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/nova-cdn_pkg_utils.SimpleErrorResponse"
+                            "$ref": "#/definitions/utils.SimpleErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/utils.SimpleErrorResponse"
                         }
                     }
                 }
@@ -656,7 +705,7 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "internal_controllers.GallerySwagger": {
+        "controllers.GallerySwagger": {
             "type": "object",
             "properties": {
                 "created_at": {
@@ -691,7 +740,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_controllers.LoginRequest": {
+        "controllers.LoginRequest": {
             "type": "object",
             "required": [
                 "email",
@@ -707,7 +756,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_controllers.LoginResponse": {
+        "controllers.LoginResponse": {
             "type": "object",
             "properties": {
                 "token": {
@@ -715,7 +764,7 @@ const docTemplate = `{
                 }
             }
         },
-        "nova-cdn_pkg_utils.Meta": {
+        "utils.Meta": {
             "type": "object",
             "properties": {
                 "current_page": {
@@ -738,7 +787,7 @@ const docTemplate = `{
                 }
             }
         },
-        "nova-cdn_pkg_utils.PaginatedResponse": {
+        "utils.PaginatedResponse": {
             "type": "object",
             "properties": {
                 "data": {},
@@ -746,7 +795,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "meta": {
-                    "$ref": "#/definitions/nova-cdn_pkg_utils.Meta"
+                    "$ref": "#/definitions/utils.Meta"
                 },
                 "success": {
                     "type": "boolean",
@@ -754,7 +803,7 @@ const docTemplate = `{
                 }
             }
         },
-        "nova-cdn_pkg_utils.Response": {
+        "utils.Response": {
             "type": "object",
             "properties": {
                 "data": {},
@@ -766,7 +815,7 @@ const docTemplate = `{
                 }
             }
         },
-        "nova-cdn_pkg_utils.SimpleErrorResponse": {
+        "utils.SimpleErrorResponse": {
             "type": "object",
             "properties": {
                 "message": {
@@ -778,7 +827,7 @@ const docTemplate = `{
                 }
             }
         },
-        "nova-cdn_pkg_utils.SimpleResponse": {
+        "utils.SimpleResponse": {
             "type": "object",
             "properties": {
                 "message": {
@@ -790,7 +839,7 @@ const docTemplate = `{
                 }
             }
         },
-        "nova-cdn_pkg_utils.ValidationErrorResponse": {
+        "utils.ValidationErrorResponse": {
             "type": "object",
             "properties": {
                 "errors": {

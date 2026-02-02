@@ -19,9 +19,11 @@ func GalleryRoutes(api fiber.Router, db *gorm.DB) {
 	galleries.Get("/:group_code<string>", galleryController.ShowByGroupCode)
 
 	galleries.Post("/:id<int>/restore", galleryController.Restore)
+	galleries.Post("/:group_code<string>/restore", galleryController.RestoreByGroupCode)
 
 	galleries.Delete("/:id<int>", galleryController.Destroy)
 	galleries.Delete("/:group_code<string>", galleryController.DestroyByGroupCode)
+
 	galleries.Delete("/:id<int>/force", galleryController.ForceDelete)
 	galleries.Delete("/:group_code<string>/force", galleryController.ForceDeleteByGroupCode)
 }

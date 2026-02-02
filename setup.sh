@@ -5,6 +5,10 @@
 
 echo "[setup.sh] Start to execute..."
 
+echo "--> Git Setup"
+sudo git checkout main
+sudo git pull origin main
+
 echo "--> Preparing directories..."
 mkdir -p logs
 touch logs/golang.log logs/golang-error.log 2>/dev/null || true

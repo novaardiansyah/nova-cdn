@@ -1,6 +1,6 @@
 basePath: /api
 definitions:
-  internal_controllers.GallerySwagger:
+  controllers.GallerySwagger:
     properties:
       created_at:
         type: string
@@ -23,7 +23,7 @@ definitions:
       user_id:
         type: integer
     type: object
-  internal_controllers.LoginRequest:
+  controllers.LoginRequest:
     properties:
       email:
         type: string
@@ -34,12 +34,12 @@ definitions:
     - email
     - password
     type: object
-  internal_controllers.LoginResponse:
+  controllers.LoginResponse:
     properties:
       token:
         type: string
     type: object
-  nova-cdn_pkg_utils.Meta:
+  utils.Meta:
     properties:
       current_page:
         type: integer
@@ -54,18 +54,18 @@ definitions:
       total_records:
         type: integer
     type: object
-  nova-cdn_pkg_utils.PaginatedResponse:
+  utils.PaginatedResponse:
     properties:
       data: {}
       message:
         type: string
       meta:
-        $ref: '#/definitions/nova-cdn_pkg_utils.Meta'
+        $ref: '#/definitions/utils.Meta'
       success:
         default: true
         type: boolean
     type: object
-  nova-cdn_pkg_utils.Response:
+  utils.Response:
     properties:
       data: {}
       message:
@@ -73,7 +73,7 @@ definitions:
       success:
         type: boolean
     type: object
-  nova-cdn_pkg_utils.SimpleErrorResponse:
+  utils.SimpleErrorResponse:
     properties:
       message:
         type: string
@@ -81,7 +81,7 @@ definitions:
         default: false
         type: boolean
     type: object
-  nova-cdn_pkg_utils.SimpleResponse:
+  utils.SimpleResponse:
     properties:
       message:
         type: string
@@ -89,7 +89,7 @@ definitions:
         default: true
         type: boolean
     type: object
-  nova-cdn_pkg_utils.ValidationErrorResponse:
+  utils.ValidationErrorResponse:
     properties:
       errors:
         additionalProperties:
@@ -128,7 +128,7 @@ paths:
         name: login
         required: true
         schema:
-          $ref: '#/definitions/internal_controllers.LoginRequest'
+          $ref: '#/definitions/controllers.LoginRequest'
       produces:
       - application/json
       responses:
@@ -136,19 +136,19 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/nova-cdn_pkg_utils.Response'
+            - $ref: '#/definitions/utils.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/internal_controllers.LoginResponse'
+                  $ref: '#/definitions/controllers.LoginResponse'
               type: object
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/nova-cdn_pkg_utils.SimpleErrorResponse'
+            $ref: '#/definitions/utils.SimpleErrorResponse'
         "422":
           description: Unprocessable Entity
           schema:
-            $ref: '#/definitions/nova-cdn_pkg_utils.ValidationErrorResponse'
+            $ref: '#/definitions/utils.ValidationErrorResponse'
       summary: Authenticate a user
       tags:
       - auth
@@ -187,17 +187,17 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/nova-cdn_pkg_utils.PaginatedResponse'
+            - $ref: '#/definitions/utils.PaginatedResponse'
             - properties:
                 data:
                   items:
-                    $ref: '#/definitions/internal_controllers.GallerySwagger'
+                    $ref: '#/definitions/controllers.GallerySwagger'
                   type: array
               type: object
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/nova-cdn_pkg_utils.SimpleErrorResponse'
+            $ref: '#/definitions/utils.SimpleErrorResponse'
       security:
       - BearerAuth: []
       summary: List galleries
@@ -224,15 +224,15 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/nova-cdn_pkg_utils.SimpleResponse'
+            $ref: '#/definitions/utils.SimpleResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/nova-cdn_pkg_utils.SimpleErrorResponse'
+            $ref: '#/definitions/utils.SimpleErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/nova-cdn_pkg_utils.SimpleErrorResponse'
+            $ref: '#/definitions/utils.SimpleErrorResponse'
       security:
       - BearerAuth: []
       summary: Soft delete galleries by group code
@@ -259,19 +259,19 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/nova-cdn_pkg_utils.Response'
+            - $ref: '#/definitions/utils.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/internal_controllers.GallerySwagger'
+                  $ref: '#/definitions/controllers.GallerySwagger'
               type: object
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/nova-cdn_pkg_utils.SimpleErrorResponse'
+            $ref: '#/definitions/utils.SimpleErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/nova-cdn_pkg_utils.SimpleErrorResponse'
+            $ref: '#/definitions/utils.SimpleErrorResponse'
       security:
       - BearerAuth: []
       summary: Show galleries by group code
@@ -298,18 +298,53 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/nova-cdn_pkg_utils.SimpleResponse'
+            $ref: '#/definitions/utils.SimpleResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/nova-cdn_pkg_utils.SimpleErrorResponse'
+            $ref: '#/definitions/utils.SimpleErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/nova-cdn_pkg_utils.SimpleErrorResponse'
+            $ref: '#/definitions/utils.SimpleErrorResponse'
       security:
       - BearerAuth: []
       summary: Permanently delete galleries by group code
+      tags:
+      - galleries
+  /galleries/{group_code}/restore:
+    post:
+      consumes:
+      - application/json
+      description: Restore a gallery item from the trash by group code
+      parameters:
+      - description: Group code
+        in: path
+        name: group_code
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/utils.SimpleResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.SimpleErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.SimpleErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.SimpleErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Restore a gallery item by group code
       tags:
       - galleries
   /galleries/{id}:
@@ -329,15 +364,15 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/nova-cdn_pkg_utils.SimpleResponse'
+            $ref: '#/definitions/utils.SimpleResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/nova-cdn_pkg_utils.SimpleErrorResponse'
+            $ref: '#/definitions/utils.SimpleErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/nova-cdn_pkg_utils.SimpleErrorResponse'
+            $ref: '#/definitions/utils.SimpleErrorResponse'
       security:
       - BearerAuth: []
       summary: Delete a gallery item (Soft Delete)
@@ -360,19 +395,19 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/nova-cdn_pkg_utils.Response'
+            - $ref: '#/definitions/utils.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/internal_controllers.GallerySwagger'
+                  $ref: '#/definitions/controllers.GallerySwagger'
               type: object
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/nova-cdn_pkg_utils.SimpleErrorResponse'
+            $ref: '#/definitions/utils.SimpleErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/nova-cdn_pkg_utils.SimpleErrorResponse'
+            $ref: '#/definitions/utils.SimpleErrorResponse'
       security:
       - BearerAuth: []
       summary: Show a gallery item
@@ -395,15 +430,15 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/nova-cdn_pkg_utils.SimpleResponse'
+            $ref: '#/definitions/utils.SimpleResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/nova-cdn_pkg_utils.SimpleErrorResponse'
+            $ref: '#/definitions/utils.SimpleErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/nova-cdn_pkg_utils.SimpleErrorResponse'
+            $ref: '#/definitions/utils.SimpleErrorResponse'
       security:
       - BearerAuth: []
       summary: Permanently delete a gallery item
@@ -426,20 +461,19 @@ paths:
         "200":
           description: OK
           schema:
-            allOf:
-            - $ref: '#/definitions/nova-cdn_pkg_utils.Response'
-            - properties:
-                data:
-                  $ref: '#/definitions/internal_controllers.GallerySwagger'
-              type: object
+            $ref: '#/definitions/utils.SimpleResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/nova-cdn_pkg_utils.SimpleErrorResponse'
-        "500":
-          description: Internal Server Error
+            $ref: '#/definitions/utils.SimpleErrorResponse'
+        "401":
+          description: Unauthorized
           schema:
-            $ref: '#/definitions/nova-cdn_pkg_utils.SimpleErrorResponse'
+            $ref: '#/definitions/utils.SimpleErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.SimpleErrorResponse'
       security:
       - BearerAuth: []
       summary: Restore a gallery item
@@ -485,21 +519,21 @@ paths:
           description: Created
           schema:
             allOf:
-            - $ref: '#/definitions/nova-cdn_pkg_utils.Response'
+            - $ref: '#/definitions/utils.Response'
             - properties:
                 data:
                   items:
-                    $ref: '#/definitions/internal_controllers.GallerySwagger'
+                    $ref: '#/definitions/controllers.GallerySwagger'
                   type: array
               type: object
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/nova-cdn_pkg_utils.SimpleErrorResponse'
+            $ref: '#/definitions/utils.SimpleErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/nova-cdn_pkg_utils.SimpleErrorResponse'
+            $ref: '#/definitions/utils.SimpleErrorResponse'
       security:
       - BearerAuth: []
       summary: Upload image to gallery
