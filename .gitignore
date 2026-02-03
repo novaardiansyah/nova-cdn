@@ -45,3 +45,6 @@ logs/golang.log
 # ! Ignore images
 public/images/*/*
 !public/images/*/.gitkeep
+
+setup.sh
+deploy/
