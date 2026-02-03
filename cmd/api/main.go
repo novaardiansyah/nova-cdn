@@ -69,11 +69,7 @@ func main() {
 		docs.SwaggerInfo.Host = "localhost:" + config.AppPort
 	}
 
-	addr := ":" + config.AppPort
-
-	if os.Getenv("APP_ENV") == "production" {
-		addr = "100.107.79.17:" + config.AppPort
-	}
+	addr := config.AppIP + ":" + config.AppPort
 
 	log.Printf("Server starting on %s...\n", addr)
 	log.Fatal(app.Listen(addr))

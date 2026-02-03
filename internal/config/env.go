@@ -9,8 +9,9 @@ import (
 )
 
 var (
-	AppURL    string
-	AppPort   string
+	AppURL  string
+	AppIP   string
+	AppPort string
 
 	MailHost        string
 	MailPort        int
@@ -28,8 +29,9 @@ func LoadEnv() {
 	}
 
 	AppURL = os.Getenv("APP_URL")
+	AppIP = os.Getenv("APP_IP")
 	AppPort = os.Getenv("APP_PORT")
-  
+
 	if AppPort == "" {
 		AppPort = "8080"
 	}
