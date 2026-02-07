@@ -46,5 +46,6 @@ logs/golang.log
 public/images/*/*
 !public/images/*/.gitkeep
 
+Makefile
 setup.sh
 deploy/
