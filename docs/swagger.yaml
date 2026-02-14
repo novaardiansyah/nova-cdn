@@ -10,12 +10,20 @@ definitions:
         type: string
       file_name:
         type: string
+      file_path:
+        type: string
       file_size:
         type: integer
+      group_code:
+        type: string
+      has_optimized:
+        type: boolean
       id:
         type: integer
       is_private:
         type: boolean
+      size:
+        type: string
       updated_at:
         type: string
       url:
@@ -87,6 +95,15 @@ definitions:
         type: string
       success:
         default: true
+        type: boolean
+    type: object
+  utils.UnauthorizedResponse:
+    properties:
+      message:
+        default: 'Unauthorized: reason...'
+        type: string
+      success:
+        default: false
         type: boolean
     type: object
   utils.ValidationErrorResponse:
@@ -528,6 +545,14 @@ paths:
               type: object
         "400":
           description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.SimpleErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.UnauthorizedResponse'
+        "404":
+          description: Not Found
           schema:
             $ref: '#/definitions/utils.SimpleErrorResponse'
         "500":

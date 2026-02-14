@@ -252,6 +252,18 @@ const docTemplate = `{
                             "$ref": "#/definitions/utils.SimpleErrorResponse"
                         }
                     },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/utils.UnauthorizedResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/utils.SimpleErrorResponse"
+                        }
+                    },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
@@ -720,14 +732,26 @@ const docTemplate = `{
                 "file_name": {
                     "type": "string"
                 },
+                "file_path": {
+                    "type": "string"
+                },
                 "file_size": {
                     "type": "integer"
+                },
+                "group_code": {
+                    "type": "string"
+                },
+                "has_optimized": {
+                    "type": "boolean"
                 },
                 "id": {
                     "type": "integer"
                 },
                 "is_private": {
                     "type": "boolean"
+                },
+                "size": {
+                    "type": "string"
                 },
                 "updated_at": {
                     "type": "string"
@@ -836,6 +860,19 @@ const docTemplate = `{
                 "success": {
                     "type": "boolean",
                     "default": true
+                }
+            }
+        },
+        "utils.UnauthorizedResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string",
+                    "default": "Unauthorized: reason..."
+                },
+                "success": {
+                    "type": "boolean",
+                    "default": false
                 }
             }
         },

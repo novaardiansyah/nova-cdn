@@ -13,7 +13,7 @@ type Gallery struct {
 	SubjectID     *uint          `json:"subject_id"`
 	SubjectType   *string        `json:"subject_type"`
 	FileName      string         `json:"file_name"`
-	FilePath      string         `json:"-"`
+	FilePath      string         `json:"file_path"`
 	Url           string         `gorm:"-" json:"url"`
 	FileSize      uint32         `json:"file_size"`
 	IsPrivate     bool           `json:"is_private"`

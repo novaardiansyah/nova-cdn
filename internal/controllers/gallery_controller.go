@@ -100,6 +100,8 @@ func (ctrl *GalleryController) Index(c *fiber.Ctx) error {
 // @Param is_private formData boolean false "Set image as private" default(false)
 // @Success 201 {object} utils.Response{data=[]GallerySwagger}
 // @Failure 400 {object} utils.SimpleErrorResponse
+// @Failure 401 {object} utils.UnauthorizedResponse
+// @Failure 404 {object} utils.SimpleErrorResponse
 // @Failure 500 {object} utils.SimpleErrorResponse
 // @Router /galleries/upload [post]
 // @Security BearerAuth
